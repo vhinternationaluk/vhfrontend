@@ -38,8 +38,8 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       className={cn(
         "relative overflow-hidden flex items-center justify-center transition-all duration-300",
         variant === 'primary' 
-          ? "bg-black text-white py-3 px-6 rounded-full hover:bg-black/90" 
-          : "bg-white border border-black py-3 px-6 rounded-full hover:bg-black/5",
+          ? "bg-amber-700 text-white py-3 px-6 rounded-full hover:bg-amber-800" 
+          : "bg-white border border-amber-700 text-amber-700 py-3 px-6 rounded-full hover:bg-amber-50",
         isAdding ? "opacity-90" : "opacity-100",
         className
       )}

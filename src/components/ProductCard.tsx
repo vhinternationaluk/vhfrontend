@@ -32,14 +32,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
       </div>
       
       <div className="p-6 flex-grow flex flex-col">
-        <span className="text-xs uppercase tracking-wider text-black/50 mb-2">
+        <span className="text-xs uppercase tracking-wider text-amber-700 mb-2">
           {product.category}
         </span>
         <h3 className="text-lg font-medium mb-2">{product.name}</h3>
         <p className="text-sm text-black/70 mb-4 line-clamp-2">{product.description}</p>
         <div className="mt-auto flex items-center justify-between">
           <span className="font-medium">${product.price}</span>
-          <span className="text-sm font-medium inline-flex items-center text-black/70 group-hover:text-black transition-colors">
+          <span className="text-sm font-medium inline-flex items-center text-amber-700 group-hover:text-amber-800 transition-colors">
             Details <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
           </span>
         </div>

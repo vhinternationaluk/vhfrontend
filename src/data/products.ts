@@ -17,175 +17,181 @@ export interface Product {
 export const products: Product[] = [
   {
     id: "1",
-    name: "Minimalist Watch",
-    description: "Elegantly designed timepiece with premium materials and exceptional craftsmanship.",
-    price: 299,
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1399&q=80",
-    category: "accessories",
+    name: "Modern Leather Sofa",
+    description: "Elegant three-seater leather sofa with sleek design and exceptional comfort for your living room.",
+    price: 1299,
+    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    category: "sofas",
     featured: true,
     details: {
       specifications: [
-        "Swiss movement",
-        "42mm case diameter",
-        "Sapphire crystal",
-        "100m water resistance",
-        "Italian leather strap"
+        "84\" W x 38\" D x 34\" H",
+        "Full-grain leather",
+        "Kiln-dried hardwood frame",
+        "Down-filled cushions",
+        "Sinuous spring suspension"
       ],
       highlights: [
-        "Hand-finished case",
-        "Super-LumiNova indices",
-        "Exhibition caseback",
+        "Hand-stitched details",
+        "Removable cushion covers",
+        "Corner-blocked joinery",
         "5-year warranty"
       ],
       materials: [
-        "316L stainless steel",
-        "Calfskin leather",
-        "Sapphire crystal"
+        "Full-grain Italian leather",
+        "Solid oak legs",
+        "High-density foam core",
+        "Hypoallergenic down alternative"
       ]
     }
   },
   {
     id: "2",
-    name: "Wireless Earbuds",
-    description: "Immersive sound experience with noise cancellation and extended battery life.",
-    price: 179,
-    image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1972&q=80",
-    category: "electronics",
+    name: "Scandinavian Dining Table",
+    description: "Minimalist solid oak dining table with clean lines and versatile design that seats up to six people.",
+    price: 899,
+    image: "https://images.unsplash.com/photo-1617098474202-0d0d7f3fb0d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    category: "dining",
     featured: true,
     details: {
       specifications: [
-        "Active noise cancellation",
-        "8-hour battery life",
-        "24-hour with charging case",
-        "IPX4 water resistance",
-        "Touch controls"
+        "72\" L x 36\" W x 30\" H",
+        "Solid oak construction",
+        "Seats 6 people",
+        "Self-leveling floor glides",
+        "Rectangular shape"
       ],
       highlights: [
-        "Adaptive EQ",
-        "Transparency mode",
-        "Spatial audio",
-        "Voice assistant compatible"
+        "FSC-certified wood",
+        "Hand-finished surfaces",
+        "Easy assembly",
+        "Stain-resistant finish"
       ],
       materials: [
-        "High-grade plastic",
-        "Silicone ear tips",
-        "Aluminum accents"
+        "Solid oak wood",
+        "Water-based finishes",
+        "Brass hardware accents",
+        "Steel reinforcements"
       ]
     }
   },
   {
     id: "3",
-    name: "Leather Backpack",
-    description: "Functional and stylish backpack crafted with premium leather for everyday use.",
-    price: 249,
-    image: "https://images.unsplash.com/photo-1622560480654-d96214fdc887?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
-    category: "bags",
+    name: "Mid-Century Accent Chair",
+    description: "Statement lounge chair with iconic mid-century design and premium upholstery for superior comfort.",
+    price: 649,
+    image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    category: "chairs",
     featured: false,
     details: {
       specifications: [
-        "Full-grain leather",
-        "15\" laptop compartment",
-        "Multiple internal pockets",
-        "Water-resistant",
-        "Magnetic closures"
+        "30\" W x 34\" D x 32\" H",
+        "19\" seat height",
+        "Molded plywood frame",
+        "360° swivel base",
+        "High-resilience foam"
       ],
       highlights: [
-        "Hand-stitched details",
-        "Breathable back panel",
-        "Adjustable straps",
-        "Lifetime warranty"
+        "Ergonomic design",
+        "Iconic silhouette",
+        "Button-tufted back",
+        "Includes accent pillow"
       ],
       materials: [
-        "Full-grain leather",
-        "YKK zippers",
-        "Cotton canvas lining"
+        "Performance velvet upholstery",
+        "Walnut veneer shell",
+        "Die-cast aluminum base",
+        "Silicon bronze glides"
       ]
     }
   },
   {
     id: "4",
-    name: "Smart Speaker",
-    description: "Voice-controlled speaker with exceptional sound quality and smart home integration.",
-    price: 129,
-    image: "https://images.unsplash.com/photo-1589003511523-86b1f9207058?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1364&q=80",
-    category: "electronics",
+    name: "King Size Platform Bed",
+    description: "Contemporary platform bed with integrated nightstands and hidden storage for modern bedrooms.",
+    price: 1499,
+    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    category: "bedroom",
     featured: true,
     details: {
       specifications: [
-        "360° sound",
-        "Far-field microphones",
-        "Wi-Fi and Bluetooth",
-        "Multi-room audio",
-        "Voice assistant"
+        "King size: 80\" W x 84\" L",
+        "12\" platform height",
+        "Integrated LED lighting",
+        "Floating design",
+        "4 storage drawers"
       ],
       highlights: [
-        "Adaptive sound",
-        "Privacy controls",
-        "Smart home hub",
-        "Automatic updates"
+        "No box spring needed",
+        "Integrated USB charging",
+        "Headboard with shelving",
+        "Easy assembly"
       ],
       materials: [
-        "Acoustic fabric",
-        "Recycled plastic",
-        "Silicone base"
+        "Engineered wood frame",
+        "Walnut veneer finish",
+        "Metal support system",
+        "Felt-lined drawers"
       ]
     }
   },
   {
     id: "5",
-    name: "Ceramic Mug Set",
-    description: "Artisanal ceramic mugs with minimalist design, perfect for your morning ritual.",
-    price: 59,
-    image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
-    category: "home",
+    name: "Minimalist Coffee Table",
+    description: "Geometric coffee table with tempered glass top and sculptural base for a statement living room centerpiece.",
+    price: 459,
+    image: "https://images.unsplash.com/photo-1532372320572-cda25653a694?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    category: "tables",
     featured: false,
     details: {
       specifications: [
-        "12 oz capacity",
-        "Microwave safe",
-        "Dishwasher safe",
-        "Set of 4",
-        "Matching saucers"
+        "48\" L x 24\" W x 18\" H",
+        "10mm tempered glass top",
+        "Open storage shelf",
+        "Geometric base design",
+        "20kg weight capacity"
       ],
       highlights: [
-        "Hand-thrown ceramics",
-        "Lead-free glaze",
-        "Unique variations",
-        "Stackable design"
+        "Nesting design",
+        "Scratch-resistant surface",
+        "Anti-tip stabilizers",
+        "Modern silhouette"
       ],
       materials: [
-        "Stoneware clay",
-        "Non-toxic glaze",
-        "Natural pigments"
+        "Tempered glass",
+        "Powder-coated steel frame",
+        "Solid ash wood accents",
+        "Brass-finish details"
       ]
     }
   },
   {
     id: "6",
-    name: "Portable Power Bank",
-    description: "Sleek, high-capacity power bank for on-the-go charging of all your devices.",
-    price: 89,
-    image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80",
-    category: "electronics",
+    name: "Handwoven Storage Ottoman",
+    description: "Versatile storage ottoman with natural handwoven exterior that functions as seating, storage, and occasional table.",
+    price: 329,
+    image: "https://images.unsplash.com/photo-1499933374294-4584851497cc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    category: "storage",
     featured: false,
     details: {
       specifications: [
-        "20,000 mAh capacity",
-        "Dual USB-C ports",
-        "Fast charging",
-        "Power delivery",
-        "LED indicator"
+        "24\" diameter x 18\" H",
+        "150lb weight capacity",
+        "Hinged lid",
+        "Interior storage",
+        "Lightweight design"
       ],
       highlights: [
-        "Aluminum body",
-        "Travel-friendly",
-        "Charge multiple devices",
-        "Pass-through charging"
+        "Multifunctional piece",
+        "Handwoven exterior",
+        "Child-safe hinges",
+        "Portable design"
       ],
       materials: [
-        "Anodized aluminum",
-        "Li-ion battery",
-        "Tempered glass"
+        "Handwoven water hyacinth",
+        "Engineered wood frame",
+        "Cotton canvas lining",
+        "Foam-padded top"
       ]
     }
   }

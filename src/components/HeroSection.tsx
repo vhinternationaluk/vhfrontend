@@ -22,21 +22,21 @@ const HeroSection = () => {
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         {/* Hero Header */}
         <div className="mb-16 md:mb-24">
-          <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider bg-black/5 rounded-full mb-3 animate-fade-in">
-            Premium Collection
+          <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider bg-amber-50 text-amber-800 rounded-full mb-3 animate-fade-in">
+            Handcrafted Quality
           </span>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight mb-6 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            Minimalist essentials<br />for modern living
+            Furniture for<br />modern living
           </h1>
           <p className="text-lg md:text-xl text-black/70 max-w-2xl mb-8 animate-fade-in" style={{ animationDelay: '400ms' }}>
-            Thoughtfully designed products that blend seamlessly into your life, enhancing everyday moments with elegance and functionality.
+            Thoughtfully designed pieces that bring comfort, style, and functionality to your home. Crafted with sustainable materials and timeless design.
           </p>
           <Link 
             to="/" 
-            className="inline-flex items-center bg-black text-white px-6 py-3 rounded-full font-medium transition-transform hover:translate-x-1 animate-fade-in" 
+            className="inline-flex items-center bg-amber-700 text-white px-6 py-3 rounded-full font-medium transition-transform hover:translate-x-1 animate-fade-in hover:bg-amber-800" 
             style={{ animationDelay: '600ms' }}
           >
-            Explore collection <ArrowRight size={18} className="ml-2" />
+            Browse collection <ArrowRight size={18} className="ml-2" />
           </Link>
         </div>
 
@@ -64,7 +64,10 @@ const HeroSection = () => {
                   className="h-full w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105" 
                 />
                 <div className="absolute bottom-0 left-0 p-8 md:p-10 w-full z-10">
-                  <div className="bg-white/80 backdrop-blur-sm p-6 md:p-8 rounded-xl max-w-md transition-transform duration-300 group-hover:translate-y-[-10px]">
+                  <div className="bg-white/90 backdrop-blur-sm p-6 md:p-8 rounded-xl max-w-md transition-transform duration-300 group-hover:translate-y-[-10px]">
+                    <span className="text-xs uppercase tracking-wider text-amber-700 mb-2 block">
+                      {product.category}
+                    </span>
                     <h3 className="text-2xl md:text-3xl font-medium mb-2">
                       {product.name}
                     </h3>
@@ -73,7 +76,7 @@ const HeroSection = () => {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-medium">${product.price}</span>
-                      <span className="inline-flex items-center text-sm font-medium">
+                      <span className="inline-flex items-center text-sm font-medium text-amber-700">
                         View details <ArrowRight size={16} className="ml-1" />
                       </span>
                     </div>
@@ -89,7 +92,7 @@ const HeroSection = () => {
               <button
                 key={index}
                 className={`w-8 h-1 rounded-full transition-all duration-300 ${
-                  index === activeIndex ? 'bg-black' : 'bg-black/20'
+                  index === activeIndex ? 'bg-amber-700' : 'bg-black/20'
                 }`}
                 onClick={() => setActiveIndex(index)}
                 aria-label={`Go to slide ${index + 1}`}
