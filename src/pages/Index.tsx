@@ -1,10 +1,12 @@
 
 import React from 'react';
+import Logo from '@/data/Assests/logo.png'
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import ProductCard from '@/components/ProductCard';
 import { products } from '@/data/products';
 import { ChevronRight } from 'lucide-react';
+import { CardDescription } from '@/components/ui/card';
 
 const Index = () => {
   // Get non-featured products for the grid
@@ -139,10 +141,20 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <div>
-              <h3 className="text-xl font-medium mb-4">Woodcraft</h3>
-              <p className="text-black/70 mb-4">
-                Artisan furniture for modern living spaces.
-              </p>
+            <div>
+          <img
+            src={Logo}
+            alt="Vhinternational Logo"
+            width={200}
+            height={200}
+            className="mb-2"
+          />
+
+          <CardDescription className="mt-2 text-sm text-gray-600 leading-relaxed">
+            400 University Drive Suite 200 Coral Gables, <br />
+            FL 33134 USA
+          </CardDescription>
+        </div>
             </div>
             <div>
               <h4 className="font-medium mb-4">Shop</h4>
@@ -175,12 +187,12 @@ const Index = () => {
           
           <div className="pt-8 border-t border-amber-100 flex flex-col md:flex-row justify-between items-center">
             <p className="text-black/50 text-sm mb-4 md:mb-0">
-              © {new Date().getFullYear()} Woodcraft. All rights reserved.
+              © {new Date().getFullYear()} VH International. All rights reserved.
             </p>
             <div className="space-x-4">
               <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Instagram</a>
-              <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Pinterest</a>
-              <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Houzz</a>
+              <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">FaceBook</a>
+              <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Twittter</a>
             </div>
           </div>
         </div>

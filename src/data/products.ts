@@ -50,7 +50,7 @@ export const products: Product[] = [
     name: "Scandinavian Dining Table",
     description: "Minimalist solid oak dining table with clean lines and versatile design that seats up to six people.",
     price: 899,
-    image: "https://images.unsplash.com/photo-1617098474202-0d0d7f3fb0d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    image: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-c7971c9/www.decorilla.com/online-decorating/wp-content/uploads/2023/06/Scandinavian-dining-room-with-light-wood-tones.jpg",
     category: "dining",
     featured: true,
     details: {
@@ -140,7 +140,7 @@ export const products: Product[] = [
     name: "Minimalist Coffee Table",
     description: "Geometric coffee table with tempered glass top and sculptural base for a statement living room centerpiece.",
     price: 459,
-    image: "https://images.unsplash.com/photo-1532372320572-cda25653a694?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
+    image: "https://chetakfurniture.co/wp-content/uploads/2024/01/813Ifmym7ZL._SX569_.jpg",
     category: "tables",
     featured: false,
     details: {
