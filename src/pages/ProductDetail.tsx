@@ -80,7 +80,7 @@ const ProductDetail = () => {
                 {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
               </span>
               <h1 className="text-3xl md:text-4xl font-medium mb-2">{product.name}</h1>
-              <p className="text-2xl mb-6">${product.price}</p>
+              <p className="text-2xl mb-6">₹{product.price}</p>
               <p className="text-black/70 mb-8">{product.description}</p>
               
               {/* Shipping & Returns Info */}

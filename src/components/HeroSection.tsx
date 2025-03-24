@@ -12,7 +12,7 @@ const HeroSection = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex(prevIndex => (prevIndex + 1) % featuredProducts.length);
-    }, 5000);
+    }, 2000);
     
     return () => clearInterval(interval);
   }, [featuredProducts.length]);
@@ -32,7 +32,7 @@ const HeroSection = () => {
             Thoughtfully designed pieces that bring comfort, style, and functionality to your home. Crafted with sustainable materials and timeless design.
           </p>
           <Link 
-            to="/" 
+            to="/shop" 
             className="inline-flex items-center bg-amber-700 text-white px-6 py-3 rounded-full font-medium transition-transform hover:translate-x-1 animate-fade-in hover:bg-amber-800" 
             style={{ animationDelay: '600ms' }}
           >
@@ -75,7 +75,7 @@ const HeroSection = () => {
                       {product.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-medium">${product.price}</span>
+                      <span className="text-xl font-medium">₹{product.price}</span>
                       <span className="inline-flex items-center text-sm font-medium text-amber-700">
                         View details <ArrowRight size={16} className="ml-1" />
                       </span>

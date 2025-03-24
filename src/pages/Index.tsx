@@ -59,7 +59,7 @@ const Index = () => {
               </span>
               <h2 className="text-3xl md:text-4xl font-medium">Our Collection</h2>
             </div>
-            <a href="#" className="inline-flex items-center text-sm font-medium hover:underline text-amber-700">
+            <a href="/shop" className="inline-flex items-center text-sm font-medium hover:underline text-amber-700">
               View all <ChevronRight size={16} className="ml-1" />
             </a>
           </div>
@@ -152,35 +152,35 @@ const Index = () => {
 
           <CardDescription className="mt-2 text-sm text-gray-600 leading-relaxed">
             400 University Drive Suite 200 Coral Gables, <br />
-            FL 33134 USA
+            FL 33134 UK
           </CardDescription>
         </div>
             </div>
             <div>
               <h4 className="font-medium mb-4">Shop</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Living Room</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Dining</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Bedroom</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Office</a></li>
+                <li><a href="product/1" className="text-black/70 hover:text-amber-700 transition-colors">Living Room</a></li>
+                <li><a href="product/2" className="text-black/70 hover:text-amber-700 transition-colors">Dining</a></li>
+                <li><a href="product/4" className="text-black/70 hover:text-amber-700 transition-colors">Bedroom</a></li>
+                <li><a href="product/11" className="text-black/70 hover:text-amber-700 transition-colors">Office</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-medium mb-4">About</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Our Story</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Craftsmanship</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Sustainability</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Contact</a></li>
+                <li><a href="/about" className="text-black/70 hover:text-amber-700 transition-colors">Our Story</a></li>
+                <li><a href="/about" className="text-black/70 hover:text-amber-700 transition-colors">Craftsmanship</a></li>
+                <li><a href="about" className="text-black/70 hover:text-amber-700 transition-colors">Sustainability</a></li>
+                <li><a href="/contact" className="text-black/70 hover:text-amber-700 transition-colors">Contact</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-medium mb-4">Support</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Delivery</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Returns</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Care Guide</a></li>
-                <li><a href="#" className="text-black/70 hover:text-amber-700 transition-colors">FAQ</a></li>
+                <li><a href="/orders" className="text-black/70 hover:text-amber-700 transition-colors">Delivery</a></li>
+                <li><a href="/contact" className="text-black/70 hover:text-amber-700 transition-colors">Returns</a></li>
+                <li><a href="/contact" className="text-black/70 hover:text-amber-700 transition-colors">Care Guide</a></li>
+                <li><a href="/contact" className="text-black/70 hover:text-amber-700 transition-colors">FAQ</a></li>
               </ul>
             </div>
           </div>
@@ -190,9 +190,9 @@ const Index = () => {
               © {new Date().getFullYear()} VH International. All rights reserved.
             </p>
             <div className="space-x-4">
-              <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Instagram</a>
+              <a href="https://www.instagram.com/vhinternational2/" className="text-black/70 hover:text-amber-700 transition-colors">Instagram</a>
               <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">FaceBook</a>
-              <a href="#" className="text-black/70 hover:text-amber-700 transition-colors">Twittter</a>
+              <a href="" className="text-black/70 hover:text-amber-700 transition-colors">Twittter</a>
             </div>
           </div>
         </div>
