@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { ShoppingCart, Menu, X, User, LogOut, Package, UserCircle } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, Package, UserCircle, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import Logo from "@/data/Assests/logo.png";
@@ -132,6 +132,13 @@ const Navbar = () => {
                   <Package className="h-4 w-4" />
                   <span>My Orders</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
+                  onClick={() => navigate('/manage-items')}
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  <span>Manage Items</span>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1 bg-gray-100" />
                 <DropdownMenuItem
                   className="flex items-center gap-2 py-2 text-red-500 cursor-pointer hover:bg-red-50 transition-colors rounded-md"
@@ -259,6 +266,13 @@ const Navbar = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     My Orders
+                  </Link>
+                  <Link
+                    to="/manage-items"
+                    className="text-2xl font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Add Items
                   </Link>
                   <button
                     className="text-2xl font-medium text-red-500 text-left"
