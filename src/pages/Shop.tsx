@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProducts } from '@/data/products'; // Import getProducts
+import { useItems } from '@/context/ItemContext';
 import Navbar from '@/components/Navbar';
 import { Separator } from '@/components/ui/separator';
 import { Filter, SlidersHorizontal, X, Plus } from 'lucide-react';
@@ -10,7 +11,12 @@ const ITEMS_PER_PAGE = 6; // Number of products to show initially and to add whe
 
 const Shop = () => {
   const navigate = useNavigate();
-  const allProducts = getProducts(); // Use getProducts
+  const defaultProducts = getProducts(); // Get default products
+  const { items: userItems } = useItems(); // Get user-added items
+  
+  // Combine default products with user-added items
+  const allProducts = [...defaultProducts, ...userItems];
+  
   const [visibleProducts, setVisibleProducts] = useState<typeof allProducts>([]);
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -24,6 +30,16 @@ const Shop = () => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
+
+  // Re-filter products when user items change
+  useEffect(() => {
+    const combinedProducts = [...defaultProducts, ...userItems];
+    setFilteredProducts(
+      activeCategory === 'all' 
+        ? combinedProducts 
+        : combinedProducts.filter(p => p.category === activeCategory)
+    );
+  }, [userItems, defaultProducts, activeCategory]);
   
   useEffect(() => {
     // Update visible products when filtered products or display count changes
@@ -33,9 +49,9 @@ const Shop = () => {
   const filterByCategory = (category: string) => {
     setActiveCategory(category);
     if (category === 'all') {
-      setFilteredProducts(allProducts);
+      setFilteredProducts([...defaultProducts, ...userItems]);
     } else {
-      setFilteredProducts(allProducts.filter(p => p.category === category));
+      setFilteredProducts([...defaultProducts, ...userItems].filter(p => p.category === category));
     }
     // Reset display count to initial value when category changes
     setDisplayCount(ITEMS_PER_PAGE);
