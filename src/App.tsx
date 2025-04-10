@@ -20,14 +20,13 @@ import NotFound from "./pages/NotFound";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 
-// Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { currentUser } = useAuth();
-  
+
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -42,25 +41,31 @@ const AppRoutes = () => {
       <Route path="/cart" element={<Cart />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
-      {/* Protected routes */}
-      <Route path="/profile" element={
-        <ProtectedRoute>
-          <Profile />
-        </ProtectedRoute>
-      } />
-      <Route path="/orders" element={
-        <ProtectedRoute>
-          <Orders />
-        </ProtectedRoute>
-      } />
-      <Route path="/manage-items" element={
-        <ProtectedRoute>
-          <ManageItems />
-        </ProtectedRoute>
-      } />
-      
-      {/* Catch-all route */}
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute>
+            <Orders />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manage-items"
+        element={
+          <ProtectedRoute>
+            <ManageItems />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

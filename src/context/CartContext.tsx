@@ -1,6 +1,5 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Product } from '../data/products';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { Product } from "../data/products";
 import { toast } from "sonner";
 
 interface CartItem {
@@ -20,29 +19,31 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Initialize cart from localStorage if available
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [items, setItems] = useState<CartItem[]>(() => {
-    const savedCart = localStorage.getItem('cart');
+    const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items));
+    localStorage.setItem("cart", JSON.stringify(items));
   }, [items]);
 
   const addToCart = (product: Product, quantity: number) => {
-    setItems(prevItems => {
-      const existingItem = prevItems.find(item => item.product.id === product.id);
-      
+    setItems((prevItems) => {
+      const existingItem = prevItems.find(
+        (item) => item.product.id === product.id
+      );
+
       if (existingItem) {
         toast(`Updated quantity for ${product.name}`, {
           description: `Quantity: ${existingItem.quantity + quantity}`,
         });
-        
-        return prevItems.map(item => 
-          item.product.id === product.id 
+
+        return prevItems.map((item) =>
+          item.product.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
@@ -50,19 +51,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toast(`Added to cart: ${product.name}`, {
           description: `Quantity: ${quantity}`,
         });
-        
+
         return [...prevItems, { product, quantity }];
       }
     });
   };
 
   const removeFromCart = (productId: string) => {
-    setItems(prevItems => {
-      const itemToRemove = prevItems.find(item => item.product.id === productId);
+    setItems((prevItems) => {
+      const itemToRemove = prevItems.find(
+        (item) => item.product.id === productId
+      );
       if (itemToRemove) {
         toast(`Removed from cart: ${itemToRemove.product.name}`);
       }
-      return prevItems.filter(item => item.product.id !== productId);
+      return prevItems.filter((item) => item.product.id !== productId);
     });
   };
 
@@ -72,11 +75,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    setItems(prevItems => 
-      prevItems.map(item => 
-        item.product.id === productId 
-          ? { ...item, quantity } 
-          : item
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.product.id === productId ? { ...item, quantity } : item
       )
     );
   };
@@ -89,7 +90,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getCartTotal = () => {
-    return items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+    return items.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0
+    );
   };
 
   const getItemCount = () => {
@@ -97,15 +101,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <CartContext.Provider value={{
-      items,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
-      getCartTotal,
-      getItemCount
-    }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        getCartTotal,
+        getItemCount,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -114,7 +120,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useCart = () => {
   const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 };

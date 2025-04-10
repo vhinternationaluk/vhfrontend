@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
@@ -13,7 +12,12 @@ export default defineConfig(({ mode }) => ({
         target: 'https://mysite-z1ch.onrender.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
-        secure: false, // Only if you're using self-signed certificates
+        secure: false, 
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+          'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
+        }
       }
     }
   },

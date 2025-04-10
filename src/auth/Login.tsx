@@ -1,29 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Mail, Lock, Eye, EyeOff, Facebook, LogIn, ArrowRight } from 'lucide-react';
-import GoogleIcon from '@/data/googleicon';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Facebook,
+  LogIn,
+  ArrowRight,
+} from "lucide-react";
+import GoogleIcon from "@/data/googleicon";
+import { useAuth } from "@/context/AuthContext";
 
 const backgrounds = [
   "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=1920&q=80",
   "https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80"
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80",
 ];
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [currentBg, setCurrentBg] = useState(0);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const { login, loginWithGoogle, loginWithFacebook, resetPassword } =
+    useAuth();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,29 +45,17 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     try {
       setIsSubmitting(true);
-      const response = await fetch('/api/user/login/', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Login failed. Please check your credentials.');
-      }
-      
-      const data = await response.json();
-      console.log('Login successful:', data);
-      localStorage.setItem('access_token', data.access_token);
-      navigate('/');
+      await login(email, password);
     } catch (error) {
-      console.error('Login error:', error);
-      setError(error instanceof Error ? error.message : 'Login failed. Please try again.');
+      console.error("Login error:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -65,26 +64,18 @@ const Login = () => {
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    
+
     try {
       setIsResettingPassword(true);
-      setError('');
-      const response = await fetch('/api/user/reset-password/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to send reset link.');
-      }
-      
+      setError("");
+      await resetPassword(email);
       setShowForgotPassword(false);
-      setError('Password reset link sent to your email!');
+      setError("Password reset link sent to your email!");
     } catch (error) {
       console.error(error);
-      setError(error instanceof Error ? error.message : 'Failed to send reset link.');
+      setError(
+        error instanceof Error ? error.message : "Failed to send reset link."
+      );
     } finally {
       setIsResettingPassword(false);
     }
@@ -92,7 +83,6 @@ const Login = () => {
 
   return (
     <div className="relative min-h-screen flex overflow-hidden">
-      {/* Background images */}
       <div className="absolute inset-0 z-0">
         {backgrounds.map((bg, index) => (
           <motion.div
@@ -100,16 +90,14 @@ const Login = () => {
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${bg})` }}
             initial={{ opacity: 0 }}
-            animate={{ 
+            animate={{
               opacity: index === currentBg ? 1 : 0,
-              transition: { duration: 1.5 } 
+              transition: { duration: 1.5 },
             }}
           />
         ))}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       </div>
-
-      {/* Login Card */}
       <motion.div
         className="relative z-10 flex items-center justify-center w-full"
         initial={{ opacity: 0 }}
@@ -127,24 +115,26 @@ const Login = () => {
             >
               <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-xl">
                 <div className="p-6">
-                  <button 
+                  <button
                     onClick={() => {
                       setShowForgotPassword(false);
-                      setError('');
+                      setError("");
                     }}
                     className="text-sm text-gray-500 hover:text-gray-700 flex items-center mb-6"
                   >
                     <ArrowRight className="h-4 w-4 rotate-180 mr-1" />
                     Back to login
                   </button>
-                  
+
                   <h2 className="text-2xl font-bold mb-2">Reset Password</h2>
                   {error && (
-                    <div className={`text-sm mb-4 p-2 rounded-md ${
-                      error.includes('sent') 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-red-100 text-red-700'
-                    }`}>
+                    <div
+                      className={`text-sm mb-4 p-2 rounded-md ${
+                        error.includes("sent")
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
                       {error}
                     </div>
                   )}
@@ -164,7 +154,7 @@ const Login = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <Button
                       type="submit"
                       className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
@@ -172,13 +162,31 @@ const Login = () => {
                     >
                       {isResettingPassword ? (
                         <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Sending Reset Link...
                         </span>
-                      ) : 'Send Reset Link'}
+                      ) : (
+                        "Send Reset Link"
+                      )}
                     </Button>
                   </form>
                 </div>
@@ -199,7 +207,9 @@ const Login = () => {
                       <Lock size={30} className="text-white" />
                     </div>
                     <h1 className="text-2xl font-bold">Welcome Back</h1>
-                    <p className="text-gray-500 mt-1">Sign in to your account</p>
+                    <p className="text-gray-500 mt-1">
+                      Sign in to your account
+                    </p>
                   </div>
 
                   {error && (
@@ -225,7 +235,7 @@ const Login = () => {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <Label htmlFor="password">Password</Label>
@@ -241,7 +251,7 @@ const Login = () => {
                           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                           <Input
                             id="password"
-                            type={isPasswordVisible ? 'text' : 'password'}
+                            type={isPasswordVisible ? "text" : "password"}
                             placeholder="Enter Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -250,14 +260,20 @@ const Login = () => {
                           />
                           <button
                             type="button"
-                            onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                            onClick={() =>
+                              setIsPasswordVisible(!isPasswordVisible)
+                            }
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
                           >
-                            {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {isPasswordVisible ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
                       </div>
-                      
+
                       <Button
                         type="submit"
                         className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
@@ -265,9 +281,25 @@ const Login = () => {
                       >
                         {isSubmitting ? (
                           <span className="flex items-center justify-center gap-2">
-                            <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg
+                              className="animate-spin h-4 w-4 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
                             </svg>
                             Signing in...
                           </span>
@@ -287,14 +319,17 @@ const Login = () => {
                         <span className="w-full border-t border-gray-200"></span>
                       </div>
                       <div className="relative flex justify-center text-xs">
-                        <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                        <span className="bg-white px-2 text-gray-500">
+                          Or continue with
+                        </span>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-3 w-full">
                       <Button
                         variant="outline"
                         className="w-full flex items-center gap-2"
+                        onClick={loginWithGoogle}
                       >
                         <GoogleIcon className="h-4 w-4" />
                         Google
@@ -302,6 +337,7 @@ const Login = () => {
                       <Button
                         variant="outline"
                         className="w-full flex items-center gap-2"
+                        onClick={loginWithFacebook}
                       >
                         <Facebook className="h-4 w-4 text-[#1877F2]" />
                         Facebook
@@ -309,8 +345,13 @@ const Login = () => {
                     </div>
 
                     <div className="text-center mt-4">
-                      <span className="text-gray-600">Don't have an account? </span>
-                      <Link to="/register" className="text-indigo-600 hover:underline">
+                      <span className="text-gray-600">
+                        Don't have an account?{" "}
+                      </span>
+                      <Link
+                        to="/register"
+                        className="text-indigo-600 hover:underline"
+                      >
                         Register here
                       </Link>
                     </div>

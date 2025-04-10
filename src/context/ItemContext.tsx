@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { toast } from "@/components/ui/use-toast";
@@ -18,7 +17,10 @@ export interface Item {
 interface ItemContextType {
   items: Item[];
   addItem: (item: Omit<Item, "id" | "userId" | "createdAt">) => Promise<void>;
-  updateItem: (id: string, updates: Partial<Omit<Item, "id" | "userId" | "createdAt">>) => Promise<void>;
+  updateItem: (
+    id: string,
+    updates: Partial<Omit<Item, "id" | "userId" | "createdAt">>
+  ) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
   getUserItems: () => Item[];
   isLoading: boolean;
@@ -26,7 +28,6 @@ interface ItemContextType {
 
 const ItemContext = createContext<ItemContextType | undefined>(undefined);
 
-// Custom hook to use the item context
 export const useItems = () => {
   const context = useContext(ItemContext);
   if (!context) {
@@ -35,12 +36,13 @@ export const useItems = () => {
   return context;
 };
 
-export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [items, setItems] = useState<Item[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { currentUser } = useAuth();
 
-  // Load items from localStorage on mount
   useEffect(() => {
     try {
       const storedItems = localStorage.getItem("items");
@@ -59,15 +61,15 @@ export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Save items to localStorage whenever they change
   useEffect(() => {
     if (!isLoading) {
       localStorage.setItem("items", JSON.stringify(items));
     }
   }, [items, isLoading]);
 
-  // Add a new item
-  const addItem = async (newItem: Omit<Item, "id" | "userId" | "createdAt">) => {
+  const addItem = async (
+    newItem: Omit<Item, "id" | "userId" | "createdAt">
+  ) => {
     if (!currentUser) {
       toast({
         title: "Error",
@@ -86,7 +88,7 @@ export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       setItems((prevItems) => [...prevItems, itemToAdd]);
-      
+
       toast({
         title: "Success",
         description: "Item added successfully",
@@ -101,8 +103,10 @@ export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Update an existing item
-  const updateItem = async (id: string, updates: Partial<Omit<Item, "id" | "userId" | "createdAt">>) => {
+  const updateItem = async (
+    id: string,
+    updates: Partial<Omit<Item, "id" | "userId" | "createdAt">>
+  ) => {
     if (!currentUser) {
       toast({
         title: "Error",
@@ -121,7 +125,7 @@ export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return item;
         })
       );
-      
+
       toast({
         title: "Success",
         description: "Item updated successfully",
@@ -136,7 +140,6 @@ export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Delete an item
   const deleteItem = async (id: string) => {
     if (!currentUser) {
       toast({
@@ -148,10 +151,12 @@ export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
-      setItems((prevItems) => 
-        prevItems.filter((item) => !(item.id === id && item.userId === currentUser.uid))
+      setItems((prevItems) =>
+        prevItems.filter(
+          (item) => !(item.id === id && item.userId === currentUser.uid)
+        )
       );
-      
+
       toast({
         title: "Success",
         description: "Item deleted successfully",
@@ -166,7 +171,6 @@ export const ItemProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Get items for the current user
   const getUserItems = () => {
     if (!currentUser) return [];
     return items.filter((item) => item.userId === currentUser.uid);

@@ -67,8 +67,11 @@ const ManageItems = () => {
     image: "",
   });
 
-  const [imagePreview, setImagePreview] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  // Separate image preview states
+  const [addImagePreview, setAddImagePreview] = useState("");
+  const [editImagePreview, setEditImagePreview] = useState("");
+  const [addImageFile, setAddImageFile] = useState<File | null>(null);
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
 
   // Reset forms
   const resetAddForm = () => {
@@ -79,8 +82,8 @@ const ManageItems = () => {
       category: "",
       image: "",
     });
-    setImagePreview("");
-    setImageFile(null);
+    setAddImagePreview("");
+    setAddImageFile(null);
   };
 
   const resetEditForm = () => {
@@ -91,11 +94,11 @@ const ManageItems = () => {
       category: "",
       image: "",
     });
-    setImagePreview("");
-    setImageFile(null);
+    setEditImagePreview("");
+    setEditImageFile(null);
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -109,17 +112,40 @@ const ManageItems = () => {
       return;
     }
 
-    setImageFile(file);
+    setAddImageFile(file);
     try {
       const base64 = await fileToBase64(file);
-      setImagePreview(base64);
-      
-      // Update the appropriate form based on which dialog is open
-      if (isAddDialogOpen) {
-        setAddFormData(prev => ({ ...prev, image: base64 }));
-      } else if (isEditDialogOpen) {
-        setEditFormData(prev => ({ ...prev, image: base64 }));
-      }
+      setAddImagePreview(base64);
+      setAddFormData(prev => ({ ...prev, image: base64 }));
+    } catch (error) {
+      console.error("Error converting image to base64:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process image",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      toast({
+        title: "Invalid image",
+        description: validation.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setEditImageFile(file);
+    try {
+      const base64 = await fileToBase64(file);
+      setEditImagePreview(base64);
+      setEditFormData(prev => ({ ...prev, image: base64 }));
     } catch (error) {
       console.error("Error converting image to base64:", error);
       toast({
@@ -200,7 +226,7 @@ const ManageItems = () => {
       category: item.category,
       image: item.image,
     });
-    setImagePreview(item.image);
+    setEditImagePreview(item.image);
     setIsEditDialogOpen(true);
   };
 
@@ -317,28 +343,28 @@ const ManageItems = () => {
         <Label htmlFor="image">Image *</Label>
         <div className="flex items-center gap-4">
           <label
-            htmlFor="image-upload"
+            htmlFor="add-image-upload"
             className="flex items-center justify-center w-full h-12 px-4 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-400 transition-colors"
           >
             <Upload size={18} className="mr-2" />
-            <span>{imageFile ? imageFile.name : "Upload image"}</span>
+            <span>{addImageFile ? addImageFile.name : "Upload image"}</span>
             <input
-              id="image-upload"
+              id="add-image-upload"
               type="file"
               accept="image/*"
-              onChange={handleImageChange}
+              onChange={handleAddImageChange}
               className="hidden"
             />
           </label>
-          {imagePreview && (
+          {addImagePreview && (
             <Button
               type="button"
               variant="ghost"
               size="icon"
               onClick={() => {
-                setImagePreview("");
+                setAddImagePreview("");
                 setAddFormData(prev => ({ ...prev, image: "" }));
-                setImageFile(null);
+                setAddImageFile(null);
               }}
             >
               <X size={18} />
@@ -347,10 +373,10 @@ const ManageItems = () => {
         </div>
       </div>
 
-      {imagePreview && (
+      {addImagePreview && (
         <div className="mt-4 border rounded-md overflow-hidden w-full max-w-xs mx-auto">
           <img
-            src={imagePreview}
+            src={addImagePreview}
             alt="Preview"
             className="w-full h-auto object-cover"
           />
@@ -417,28 +443,28 @@ const ManageItems = () => {
         <Label htmlFor="image">Image *</Label>
         <div className="flex items-center gap-4">
           <label
-            htmlFor="image-upload"
+            htmlFor="edit-image-upload"
             className="flex items-center justify-center w-full h-12 px-4 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-400 transition-colors"
           >
             <Upload size={18} className="mr-2" />
-            <span>{imageFile ? imageFile.name : "Upload image"}</span>
+            <span>{editImageFile ? editImageFile.name : "Upload image"}</span>
             <input
-              id="image-upload"
+              id="edit-image-upload"
               type="file"
               accept="image/*"
-              onChange={handleImageChange}
+              onChange={handleEditImageChange}
               className="hidden"
             />
           </label>
-          {imagePreview && (
+          {editImagePreview && (
             <Button
               type="button"
               variant="ghost"
               size="icon"
               onClick={() => {
-                setImagePreview("");
-                setEditFormData(prev => ({ ...prev, image: "" }));
-                setImageFile(null);
+                setEditImagePreview("");
+                setEditFormData(prev => ({ ...prev, image: editingItem?.image || "" }));
+                setEditImageFile(null);
               }}
             >
               <X size={18} />
@@ -447,10 +473,10 @@ const ManageItems = () => {
         </div>
       </div>
 
-      {imagePreview && (
+      {editImagePreview && (
         <div className="mt-4 border rounded-md overflow-hidden w-full max-w-xs mx-auto">
           <img
-            src={imagePreview}
+            src={editImagePreview}
             alt="Preview"
             className="w-full h-auto object-cover"
           />

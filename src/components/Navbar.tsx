@@ -2,7 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { ShoppingCart, Menu, X, User, LogOut, Package, UserCircle, ShoppingBag } from "lucide-react";
+import {
+  ShoppingCart,
+  Menu,
+  X,
+  User,
+  LogOut,
+  Package,
+  UserCircle,
+  ShoppingBag,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import Logo from "@/data/Assests/logo.png";
@@ -24,7 +33,6 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Track scroll position to change navbar appearance
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
@@ -38,7 +46,6 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      // Navigation is handled in the AuthContext
     } catch (error) {
       console.error("Failed to logout:", error);
     }
@@ -52,7 +59,6 @@ const Navbar = () => {
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* Logo */}
         <div className="flex-shrink-0 -ml-24" style={{ maxHeight: "100%" }}>
           <img
             src={Logo}
@@ -63,7 +69,6 @@ const Navbar = () => {
           />
         </div>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link
             to="/"
@@ -91,7 +96,6 @@ const Navbar = () => {
           </Link>
         </nav>
 
-        {/* Icon Navigation */}
         <div className="flex items-center space-x-4">
           {currentUser ? (
             <DropdownMenu>
@@ -120,21 +124,21 @@ const Navbar = () => {
                 </div>
                 <DropdownMenuItem
                   className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md mt-1"
-                  onClick={() => navigate('/profile')}
+                  onClick={() => navigate("/profile")}
                 >
                   <UserCircle className="h-4 w-4" />
                   <span>My Profile</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
-                  onClick={() => navigate('/orders')}
+                  onClick={() => navigate("/orders")}
                 >
                   <Package className="h-4 w-4" />
                   <span>My Orders</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
-                  onClick={() => navigate('/manage-items')}
+                  onClick={() => navigate("/manage-items")}
                 >
                   <ShoppingBag className="h-4 w-4" />
                   <span>Manage Items</span>
@@ -192,10 +196,9 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
+          <motion.div
             className="fixed inset-0 bg-white z-50 flex flex-col"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -250,7 +253,7 @@ const Navbar = () => {
               >
                 Contact
               </Link>
-              
+
               {currentUser && (
                 <>
                   <Link
@@ -285,7 +288,7 @@ const Navbar = () => {
                   </button>
                 </>
               )}
-              
+
               {!currentUser && (
                 <Link
                   to="/login"
