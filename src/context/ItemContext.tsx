@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { toast } from "@/components/ui/use-toast";
 
-// Define the Item interface
+// here i have efine the Item interface
 export interface Item {
   id: string;
   name: string;

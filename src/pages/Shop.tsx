@@ -1,37 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProducts } from '@/data/products'; // Import getProducts
+import { getProducts } from '@/data/products'; 
 import { useItems } from '@/context/ItemContext';
 import Navbar from '@/components/Navbar';
 import { Separator } from '@/components/ui/separator';
 import { Filter, SlidersHorizontal, X, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const ITEMS_PER_PAGE = 6; // Number of products to show initially and to add when "Load More" is clicked
+const ITEMS_PER_PAGE = 6; 
 
 const Shop = () => {
   const navigate = useNavigate();
-  const defaultProducts = getProducts(); // Get default products
-  const { items: userItems } = useItems(); // Get user-added items
+  const defaultProducts = getProducts(); 
+  const { items: userItems } = useItems(); 
   
-  // Combine default products with user-added items
   const allProducts = [...defaultProducts, ...userItems];
-  
   const [visibleProducts, setVisibleProducts] = useState<typeof allProducts>([]);
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const [activeCategory, setActiveCategory] = useState('all');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState(allProducts);
   
-  // Extract unique categories
+  // it will extract unique categories
   const categories: string[] = ['all', ...Array.from(new Set(allProducts.map(p => p.category)))];
   
   useEffect(() => {
-    // Scroll to top when component mounts
+    // this willl scroll the page to top when component mounts
     window.scrollTo(0, 0);
   }, []);
 
-  // Re-filter products when user items change
+  // it will re-filter products when user items change
   useEffect(() => {
     const combinedProducts = [...defaultProducts, ...userItems];
     setFilteredProducts(
@@ -42,7 +40,7 @@ const Shop = () => {
   }, [userItems, defaultProducts, activeCategory]);
   
   useEffect(() => {
-    // Update visible products when filtered products or display count changes
+    // it will update visible products when filtered products or display count changes
     setVisibleProducts(filteredProducts.slice(0, displayCount));
   }, [filteredProducts, displayCount]);
   
@@ -53,7 +51,7 @@ const Shop = () => {
     } else {
       setFilteredProducts([...defaultProducts, ...userItems].filter(p => p.category === category));
     }
-    // Reset display count to initial value when category changes
+    // it will reset display count to initial value when category changes
     setDisplayCount(ITEMS_PER_PAGE);
   };
   
@@ -69,7 +67,6 @@ const Shop = () => {
       
       <div className="pt-24 pb-20">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-          {/* Page title */}
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}

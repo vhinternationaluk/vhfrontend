@@ -14,483 +14,610 @@ export interface Product {
 }
 
 export const products: Product[] = [
+  // Lighting Category
   {
     id: "1",
-    name: "Modern Leather Sofa",
-    description: "Elegant three-seater leather sofa with sleek design and exceptional comfort for your living room.",
-    price: 40000,
-    image: "https://images.unsplash.com/photo-1643717714673-830d9cb8ea26?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "sofas",
+    name: "Brass Cup and Tray",
+    description: "Modern geometric pendant light with antique brass finish, perfect for dining rooms and entryways.",
+    price: 12999,
+    image: "/ProductImages/250.jpg",
+    category: "lighting",
     featured: true,
     details: {
       specifications: [
-        "84\" W x 38\" D x 34\" H",
-        "Full-grain leather",
-        "Kiln-dried hardwood frame",
-        "Down-filled cushions",
-        "Sinuous spring suspension"
+        "18\" diameter x 24\" H",
+        "Adjustable chain length",
+        "E26 bulb socket",
+        "Maximum 60W bulb",
+        "Dimmable compatible"
       ],
       highlights: [
-        "Hand-stitched details",
-        "Removable cushion covers",
-        "Corner-blocked joinery",
-        "5-year warranty"
+        "Geometric design",
+        "Antique brass finish",
+        "Easy installation",
+        "Modern aesthetic"
       ],
       materials: [
-        "Full-grain Italian leather",
-        "Solid oak legs",
-        "High-density foam core",
-        "Hypoallergenic down alternative"
+        "Solid brass construction",
+        "Hand-finished details",
+        "Premium wiring components",
+        "Steel mounting hardware"
       ]
     }
   },
   {
     id: "2",
-    name: "Scandinavian Dining Table",
-    description: "Minimalist solid oak dining table with clean lines and versatile design that seats up to six people.",
-    price: 8999,
-    image: "https://cdn-bnokp.nitrocdn.com/QNoeDwCprhACHQcnEmHgXDhDpbEOlRHH/assets/images/optimized/rev-c7971c9/www.decorilla.com/online-decorating/wp-content/uploads/2023/06/Scandinavian-dining-room-with-light-wood-tones.jpg",
-    category: "dining",
-    featured: true,
+    name: "Brass Table Lamp",
+    description: "Contemporary table lamp with brushed brass base and linen shade.",
+    price: 5999,
+    image: "/ProductImages/127.jpg",
+    category: "lighting",
+    featured: false,
     details: {
       specifications: [
-        "72\" L x 36\" W x 30\" H",
-        "Solid oak construction",
-        "Seats 6 people",
-        "Self-leveling floor glides",
-        "Rectangular shape"
+        "16\" shade diameter",
+        "26\" total height",
+        "E26 socket type",
+        "3-way switch",
+        "6ft cord length"
       ],
       highlights: [
-        "FSC-certified wood",
-        "Hand-finished surfaces",
-        "Easy assembly",
-        "Stain-resistant finish"
+        "Modern silhouette",
+        "Warm ambient light",
+        "Stable base design",
+        "Versatile style"
       ],
       materials: [
-        "Solid oak wood",
-        "Water-based finishes",
-        "Brass hardware accents",
-        "Steel reinforcements"
+        "Brushed brass base",
+        "Natural linen shade",
+        "Brass accents",
+        "UL listed components"
       ]
     }
   },
   {
     id: "3",
-    name: "Mid-Century Accent Chair",
-    description: "Statement lounge chair with iconic mid-century design and premium upholstery for superior comfort.",
-    price: 6499,
-    image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    category: "chairs",
-    featured: false,
+    name: "Brass Floor Lamp",
+    description: "Contemporary floor lamp with brass finish and adjustable head.",
+    price: 7999,
+    image: "/ProductImages/215.jpg",
+    category: "lighting",
+    featured: true,
     details: {
       specifications: [
-        "30\" W x 34\" D x 32\" H",
-        "19\" seat height",
-        "Molded plywood frame",
-        "360° swivel base",
-        "High-resilience foam"
+        "72\" total height",
+        "Adjustable head",
+        "E26 socket type",
+        "3-way switch",
+        "8ft cord length"
       ],
       highlights: [
-        "Ergonomic design",
-        "Iconic silhouette",
-        "Button-tufted back",
-        "Includes accent pillow"
+        "Modern design",
+        "Adjustable lighting",
+        "Stable base",
+        "Versatile placement"
       ],
       materials: [
-        "Performance velvet upholstery",
-        "Walnut veneer shell",
-        "Die-cast aluminum base",
-        "Silicon bronze glides"
+        "Brass finish",
+        "Steel construction",
+        "Premium wiring",
+        "Weighted base"
       ]
     }
   },
   {
     id: "4",
-    name: "King Size Platform Bed",
-    description: "Contemporary platform bed with integrated nightstands and hidden storage for modern bedrooms.",
-    price: 14999,
-    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    category: "bedroom",
-    featured: true,
+    name: "Brass Wall Sconce",
+    description: "Elegant wall sconce with articulating arm and antique brass finish.",
+    price: 4599,
+    image: "/ProductImages/221.jpg",
+    category: "lighting",
+    featured: false,
     details: {
       specifications: [
-        "King size: 80\" W x 84\" L",
-        "12\" platform height",
-        "Integrated LED lighting",
-        "Floating design",
-        "4 storage drawers"
+        "6\" backplate diameter",
+        "20\" arm reach",
+        "E12 socket type",
+        "Hardwired installation",
+        "Adjustable head"
       ],
       highlights: [
-        "No box spring needed",
-        "Integrated USB charging",
-        "Headboard with shelving",
-        "Easy assembly"
+        "Adjustable design",
+        "Vintage inspiration",
+        "Easy installation",
+        "UL listed"
       ],
       materials: [
-        "Engineered wood frame",
-        "Walnut veneer finish",
-        "Metal support system",
-        "Felt-lined drawers"
+        "Antique brass finish",
+        "Steel construction",
+        "Premium wiring",
+        "Mounting hardware included"
       ]
     }
   },
   {
     id: "5",
-    name: "Minimalist Coffee Table",
-    description: "Geometric coffee table with tempered glass top and sculptural base for a statement living room centerpiece.",
-    price: 4599,
-    image: "https://chetakfurniture.co/wp-content/uploads/2024/01/813Ifmym7ZL._SX569_.jpg",
-    category: "tables",
+    name: "Brass Tea Cups",
+    description: "Modern tea cups with brass finish and frosted glass shade.",
+    price: 8999,
+    image: "/ProductImages/245.jpg",
+    category: "lighting",
     featured: false,
     details: {
       specifications: [
-        "48\" L x 24\" W x 18\" H",
-        "10mm tempered glass top",
-        "Open storage shelf",
-        "Geometric base design",
-        "20kg weight capacity"
+        "16\" diameter",
+        "E26 socket type",
+        "Hardwired installation",
+        "Dimmable compatible",
+        "LED compatible"
       ],
       highlights: [
-        "Nesting design",
-        "Scratch-resistant surface",
-        "Anti-tip stabilizers",
-        "Modern silhouette"
+        "Modern design",
+        "Soft diffused light",
+        "Easy installation",
+        "Energy efficient"
       ],
       materials: [
-        "Tempered glass",
-        "Powder-coated steel frame",
-        "Solid ash wood accents",
-        "Brass-finish details"
+        "Brass finish",
+        "Frosted glass",
+        "Premium wiring",
+        "Mounting hardware"
       ]
     }
   },
   {
     id: "6",
-    name: "Handwoven Storage Ottoman",
-    description: "Versatile storage ottoman with natural handwoven exterior that functions as seating, storage, and occasional table.",
-    price: 32999,
-    image: "https://images.unsplash.com/photo-1499933374294-4584851497cc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80",
-    category: "storage",
+    name: "Brass Desk Lamp",
+    description: "Modern desk lamp with brass finish and adjustable arm.",
+    price: 4999,
+    image: "/ProductImages/261.jpg",
+    category: "lighting",
     featured: false,
     details: {
       specifications: [
-        "24\" diameter x 18\" H",
-        "150lb weight capacity",
-        "Hinged lid",
-        "Interior storage",
-        "Lightweight design"
+        "18\" arm reach",
+        "Adjustable head",
+        "E26 socket type",
+        "3-way switch",
+        "6ft cord length"
       ],
       highlights: [
-        "Multifunctional piece",
-        "Handwoven exterior",
-        "Child-safe hinges",
-        "Portable design"
+        "Adjustable design",
+        "Modern aesthetic",
+        "Stable base",
+        "Task lighting"
       ],
       materials: [
-        "Handwoven water hyacinth",
-        "Engineered wood frame",
-        "Cotton canvas lining",
-        "Foam-padded top"
+        "Brass finish",
+        "Steel construction",
+        "Premium wiring",
+        "Weighted base"
       ]
     }
   },
+
+  // Furniture Category
   {
     id: "7",
-    name: "Artisanal Bookshelf",
-    description: "Handcrafted bookshelf featuring open shelving design and natural wood with black metal accents.",
-    price: 8999,
-    image: "https://i.etsystatic.com/10146012/r/il/d2f52c/2305892882/il_570xN.2305892882_ez5y.jpg",
-    category: "storage",
+    name: "Brass Bar Cart",
+    description: "Luxurious two-tier bar cart with polished brass frame and tempered glass shelves.",
+    price: 15999,
+    image: "/ProductImages/277.jpg",
+    category: "furniture",
     featured: true,
     details: {
       specifications: [
-        "36\" W x 16\" D x 72\" H",
-        "5 adjustable shelves",
-        "Wall anchoring system",
-        "80kg per shelf capacity",
-        "Open-back design"
+        "32\" W x 18\" D x 32\" H",
+        "Two glass shelves",
+        "Rolling casters",
+        "75 lb capacity per shelf",
+        "360° mobility"
       ],
       highlights: [
-        "Modular configuration",
-        "Artisanal craftsmanship",
-        "Adjustable leveling feet",
-        "Sustainably sourced wood"
+        "Art deco inspired",
+        "Removable glass shelves",
+        "Locking wheels",
+        "Easy assembly"
       ],
       materials: [
-        "Solid acacia wood",
-        "Powder-coated steel frame",
-        "Brass shelf supports",
-        "Non-toxic finishes"
+        "Polished brass frame",
+        "Tempered glass shelves",
+        "Premium casters",
+        "Protective floor pads"
       ]
     }
   },
   {
     id: "8",
-    name: "Velvet Lounge Chair",
-    description: "Luxurious velvet lounge chair with elegant curved design and gold-finish metal base.",
-    price: 7499,
-    image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2158&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "chairs",
+    name: "Brass Coffee Table",
+    description: "Modern coffee table with brass frame and tempered glass top.",
+    price: 18999,
+    image: "/ProductImages/287.jpg",
+    category: "furniture",
     featured: true,
     details: {
       specifications: [
-        "33\" W x 35\" D x 32\" H",
-        "18\" seat height",
-        "Channel tufting",
-        "Swivel base",
-        "Contoured backrest"
+        "48\" L x 28\" W x 18\" H",
+        "12mm glass thickness",
+        "Geometric base design",
+        "100 lb capacity",
+        "Protective floor pads"
       ],
       highlights: [
-        "Plush comfort",
-        "Statement silhouette",
-        "Stain-resistant velvet",
-        "Premium construction"
+        "Contemporary design",
+        "Durable construction",
+        "Easy assembly",
+        "Striking presence"
       ],
       materials: [
-        "Premium velvet upholstery",
-        "Gold-finish stainless steel",
-        "High-density foam cushioning",
-        "Reinforced hardwood frame"
+        "Polished brass frame",
+        "Tempered glass top",
+        "Protective glass coating",
+        "Non-scratch floor pads"
       ]
     }
   },
   {
     id: "9",
-    name: "Marble Dining Table",
-    description: "Elegant round dining table with genuine marble top and sophisticated brass finish base.",
-    price: 18999,
-    image: "https://images.unsplash.com/photo-1604578762246-41134e37f9cc?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "dining",
+    name: "Brass Side Table",
+    description: "Elegant side table with brass frame and marble top.",
+    price: 12999,
+    image: "/ProductImages/253.jpg",
+    category: "furniture",
     featured: false,
     details: {
       specifications: [
-        "60\" diameter x 30\" H",
-        "Genuine marble top",
-        "Seats 6 people",
-        "Pedestal base",
-        "15mm marble thickness"
+        "20\" W x 20\" D x 24\" H",
+        "Marble top",
+        "Geometric base",
+        "50 lb capacity",
+        "Protective pads"
       ],
       highlights: [
-        "Natural stone variation",
-        "Hand-polished surface",
-        "Protected with sealant",
-        "Heirloom quality piece"
+        "Luxurious materials",
+        "Stable construction",
+        "Easy assembly",
+        "Versatile use"
       ],
       materials: [
-        "Italian Carrara marble",
-        "Brass-finished steel base",
-        "Protective floor pads",
-        "Water-resistant sealant"
+        "Brass frame",
+        "Carrara marble top",
+        "Protective coating",
+        "Non-scratch pads"
       ]
     }
   },
   {
     id: "10",
-    name: "Rattan Accent Chair",
-    description: "Natural rattan accent chair with organic form and comfortable cushion for a touch of bohemian style.",
-    price: 15499,
-    image: "https://images.unsplash.com/photo-1487015307662-6ce6210680f1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "chairs",
-    featured: false,
+    name: "Brass Console Table",
+    description: "Elegant console table with brass frame and glass top.",
+    price: 14999,
+    image: "/ProductImages/221.jpg",
+    category: "furniture",
+    featured: true,
     details: {
       specifications: [
-        "32\" W x 33\" D x 34\" H",
-        "18\" seat height",
-        "Handwoven frame",
-        "Removable cushion",
-        "Indoor use only"
+        "48\" W x 16\" D x 30\" H",
+        "Tempered glass top",
+        "Geometric base",
+        "75 lb capacity",
+        "Protective pads"
       ],
       highlights: [
-        "Artisan crafted",
-        "Lightweight design",
-        "Ergonomic form",
-        "Natural material variation"
+        "Sleek design",
+        "Durable construction",
+        "Easy assembly",
+        "Versatile placement"
       ],
       materials: [
-        "Natural rattan",
-        "Sustainable hardwood frame",
-        "Cotton cushion cover",
-        "High-resilience foam filling"
+        "Brass frame",
+        "Tempered glass",
+        "Protective coating",
+        "Non-scratch pads"
       ]
     }
   },
   {
     id: "11",
-    name: "Scandinavian Desk",
-    description: "Minimalist work desk with sleek lines and built-in storage for an organized home office.",
-    price: 17499,
-    image: "https://png.pngtree.com/background/20230827/original/pngtree-d-rendering-of-a-cozy-scandinavian-office-with-wood-table-and-picture-image_4838900.jpg",
-    category: "office",
-    featured: false,
+    name: "Brass Dining Table",
+    description: "Modern dining table with brass frame and marble top.",
+    price: 24999,
+    image: "/ProductImages/271.jpg",
+    category: "furniture",
+    featured: true,
     details: {
       specifications: [
-        "52\" W x 26\" D x 30\" H",
-        "2 storage drawers",
-        "Cable management system",
-        "Angled legs",
-        "Writing surface"
+        "72\" L x 36\" W x 30\" H",
+        "Marble top",
+        "Seats 6 people",
+        "150 lb capacity",
+        "Protective pads"
       ],
       highlights: [
-        "Clean aesthetic",
-        "Hidden storage",
-        "Solid construction",
-        "Multifunctional use"
+        "Luxurious design",
+        "Durable construction",
+        "Easy assembly",
+        "Statement piece"
       ],
       materials: [
-        "Solid white oak",
-        "Lacquered finish",
-        "Metal drawer glides",
-        "Bronze hardware"
+        "Brass frame",
+        "Carrara marble top",
+        "Protective coating",
+        "Non-scratch pads"
       ]
     }
   },
   {
     id: "12",
-    name: "Media Console",
-    description: "Contemporary media console with sliding doors and integrated speaker fabric for a sleek entertainment setup.",
-    price: 9999,
-    image: "https://t3.ftcdn.net/jpg/03/76/17/64/360_F_376176417_aOQx7Ppibwj5UD9lJjyyPhYIfNIa41SU.jpg",
-    category: "storage",
-    featured: true,
-    details: {
-      specifications: [
-        "68\" W x 18\" D x 24\" H",
-        "Sliding cabinet doors",
-        "Acoustic speaker fabric",
-        "Wire management",
-        "Adjustable shelving"
-      ],
-      highlights: [
-        "Floating design",
-        "Remote control access",
-        "Ventilated back panel",
-        "Wall-mounting option"
-      ],
-      materials: [
-        "Walnut veneer",
-        "Acoustic fabric panels",
-        "Soft-closing hardware",
-        "Metal legs with levelers"
-      ]
-    }
-  },
-  {
-    id: "13",
-    name: "Linen Loveseat",
-    description: "Compact two-seater sofa upholstered in natural linen with tapered wooden legs for small spaces.",
+    name: "Brass Nightstand",
+    description: "Modern nightstand with brass frame and marble top.",
     price: 8999,
-    image: "https://images.unsplash.com/photo-1540574163026-643ea20ade25?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "sofas",
+    image: "/ProductImages/281.jpg",
+    category: "furniture",
     featured: false,
     details: {
       specifications: [
-        "62\" W x 34\" D x 35\" H",
-        "Two-seater design",
-        "Removable seat cushions",
-        "8-way hand-tied springs",
-        "Kiln-dried frame"
+        "18\" W x 16\" D x 24\" H",
+        "Marble top",
+        "Drawer storage",
+        "30 lb capacity",
+        "Protective pads"
       ],
       highlights: [
-        "Apartment-friendly scale",
-        "Stain-resistant fabric",
-        "Plush comfort",
-        "Classic silhouette"
+        "Compact design",
+        "Storage space",
+        "Easy assembly",
+        "Versatile use"
       ],
       materials: [
-        "Belgian linen upholstery",
-        "Solid beech wood legs",
-        "High-density foam",
-        "No-sag spring system"
+        "Brass frame",
+        "Marble top",
+        "Wooden drawer",
+        "Non-scratch pads"
+      ]
+    }
+  },
+
+  // Decor Category
+  {
+    id: "13",
+    name: "Brass Wall Mirror",
+    description: "Elegant round wall mirror with brushed brass frame and decorative detailing.",
+    price: 8999,
+    image: "/ProductImages/225.jpg",
+    category: "decor",
+    featured: true,
+    details: {
+      specifications: [
+        "36\" diameter",
+        "2\" frame depth",
+        "15 lbs weight",
+        "Beveled glass edge",
+        "Secure wall mounting"
+      ],
+      highlights: [
+        "Timeless design",
+        "Versatile placement",
+        "Premium glass quality",
+        "Handcrafted frame"
+      ],
+      materials: [
+        "Solid brass frame",
+        "Premium mirror glass",
+        "Protective backing",
+        "Brass mounting hardware"
       ]
     }
   },
   {
     id: "14",
-    name: "Queen Upholstered Bed",
-    description: "Contemporary upholstered bed with channel-tufted headboard and wingback design for elegant bedrooms.",
-    price: 12999,
-    image: "https://images.unsplash.com/photo-1588046130717-0eb0c9a3ba15?q=80&w=2149&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "bedroom",
+    name: "Brass Candle Holders",
+    description: "Set of three geometric brass candle holders with varying heights.",
+    price: 3999,
+    image: "/ProductImages/251.jpg",
+    category: "decor",
     featured: false,
     details: {
       specifications: [
-        "Queen size: 63\" W x 86\" L",
-        "64\" headboard height",
-        "Channel tufting",
-        "Wingback design",
-        "Center support leg"
+        "4\", 6\", and 8\" heights",
+        "3\" diameter base",
+        "Fits standard tapers",
+        "Set of three",
+        "Protective felt base"
       ],
       highlights: [
-        "Statement headboard",
-        "No box spring needed",
-        "Noise-reducing construction",
-        "Easy assembly"
+        "Modern geometric design",
+        "Varying heights",
+        "Stable construction",
+        "Gift-ready packaging"
       ],
       materials: [
-        "Performance velvet upholstery",
-        "Solid pine slats",
-        "Engineered wood frame",
-        "Metal leg supports"
+        "Solid brass construction",
+        "Protective coating",
+        "Non-slip base",
+        "Tarnish-resistant finish"
       ]
     }
   },
   {
     id: "15",
-    name: "Canopy Bed Frame",
-    description: "Dramatic four-poster canopy bed with architectural frame and minimalist design for a statement bedroom.",
-    price: 15999,
-    image: "https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    category: "bedroom",
-    featured: true,
+    name: "Brass Plant Stand",
+    description: "Modern geometric plant stand with brass finish and multiple tiers.",
+    price: 2999,
+    image: "/ProductImages/291.jpg",
+    category: "decor",
+    featured: false,
     details: {
       specifications: [
-        "King size available",
-        "82\" height to canopy",
-        "Four-poster design",
-        "12\" under-bed clearance",
-        "Slat support system"
+        "12\" W x 12\" D x 24\" H",
+        "Three tiers",
+        "15 lb capacity per tier",
+        "Indoor use",
+        "Adjustable feet"
       ],
       highlights: [
-        "Architectural silhouette",
-        "No box spring required",
-        "Customizable fabric canopy",
-        "Minimal assembly"
+        "Space-saving design",
+        "Multiple display options",
+        "Stable construction",
+        "Easy assembly"
       ],
       materials: [
-        "Powder-coated steel frame",
-        "Solid oak legs",
-        "Steel support slats",
-        "Non-toxic finish"
+        "Brass-plated steel",
+        "Protective coating",
+        "Non-slip feet",
+        "Rust-resistant finish"
       ]
     }
   },
   {
     id: "16",
-    name: "Round Nesting Tables",
-    description: "Set of three nesting tables with marble tops and brass-finish bases for versatile living room use.",
-    price: 5999,
-    image: "https://m.media-amazon.com/images/I/81oOCWXdUTL.jpg",
-    category: "tables",
+    name: "Brass Wall Clock",
+    description: "Modern wall clock with brass frame and minimalist design.",
+    price: 3499,
+    image: "/ProductImages/241.jpg",
+    category: "decor",
     featured: false,
     details: {
       specifications: [
-        "Large: 24\" dia. x 22\" H",
-        "Medium: 20\" dia. x 18\" H",
-        "Small: 16\" dia. x 16\" H",
-        "Nesting design",
-        "Protective floor glides"
+        "24\" diameter",
+        "Quartz movement",
+        "Silent operation",
+        "Battery operated",
+        "Easy installation"
       ],
       highlights: [
-        "Space-saving design",
-        "Multifunctional use",
-        "Natural stone variation",
-        "Lightweight mobility"
+        "Minimalist design",
+        "Silent operation",
+        "Easy to read",
+        "Modern aesthetic"
       ],
       materials: [
-        "Genuine marble tops",
-        "Brass-finished steel bases",
-        "Protective felt bottom",
-        "Sealed stone surfaces"
+        "Brass frame",
+        "Premium glass",
+        "Quartz movement",
+        "Battery included"
+      ]
+    }
+  },
+  {
+    id: "17",
+    name: "Brass Tea Sets",
+    description: "Set of three brass picture frames with modern design.",
+    price: 2499,
+    image: "/ProductImages/283.jpg",
+    category: "decor",
+    featured: false,
+    details: {
+      specifications: [
+        "8\" x 10\", 5\" x 7\", 4\" x 6\"",
+        "Set of three",
+        "Standing or hanging",
+        "Easy to use",
+        "Protective backing"
+      ],
+      highlights: [
+        "Modern design",
+        "Multiple sizes",
+        "Versatile display",
+        "Gift-ready"
+      ],
+      materials: [
+        "Brass finish",
+        "Premium glass",
+        "Protective backing",
+        "Stand included"
+      ]
+    }
+  },
+  {
+    id: "18",
+    name: "Brass Bookends",
+    description: "Set of brass bookends with geometric design.",
+    price: 1999,
+    image: "/ProductImages/301.jpg",
+    category: "decor",
+    featured: false,
+    details: {
+      specifications: [
+        "6\" H x 4\" W",
+        "Set of two",
+        "Weighted base",
+        "Non-slip bottom",
+        "Easy to use"
+      ],
+      highlights: [
+        "Modern design",
+        "Stable construction",
+        "Versatile use",
+        "Gift-ready"
+      ],
+      materials: [
+        "Solid brass",
+        "Weighted base",
+        "Protective coating",
+        "Non-slip pads"
+      ]
+    }
+  },
+
+  // Accessories Category
+  {
+    id: "19",
+    name: "Brass Key Holder",
+    description: "Modern key holder with brass finish and hooks.",
+    price: 1499,
+    image: "/ProductImages/295.jpg",
+    category: "accessories",
+    featured: false,
+    details: {
+      specifications: [
+        "12\" W x 6\" H",
+        "6 hooks",
+        "Wall mounted",
+        "Easy installation",
+        "Protective backing"
+      ],
+      highlights: [
+        "Modern design",
+        "Multiple hooks",
+        "Easy installation",
+        "Organized storage"
+      ],
+      materials: [
+        "Brass finish",
+        "Steel hooks",
+        "Protective backing",
+        "Mounting hardware"
+      ]
+    }
+  },
+  {
+    id: "20",
+    name: "Brass Coat Rack",
+    description: "Modern coat rack with brass finish and hooks.",
+    price: 2999,
+    image: "/ProductImages/299.jpg",
+    category: "accessories",
+    featured: false,
+    details: {
+      specifications: [
+        "24\" W x 6\" D x 48\" H",
+        "6 hooks",
+        "Wall mounted",
+        "Easy installation",
+        "Protective backing"
+      ],
+      highlights: [
+        "Modern design",
+        "Multiple hooks",
+        "Easy installation",
+        "Organized storage"
+      ],
+      materials: [
+        "Brass finish",
+        "Steel hooks",
+        "Protective backing",
+        "Mounting hardware"
       ]
     }
   }
@@ -503,7 +630,6 @@ export const getProductById = (id: string): Product | undefined => {
 export const getFeaturedProducts = (): Product[] => {
   return products.filter(product => product.featured);
 };
-
 
 export const getProducts = (): Product[] => {
   return products;

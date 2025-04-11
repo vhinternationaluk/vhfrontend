@@ -8,14 +8,14 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 
 const Cart = () => {
-    const { items, removeFromCart, updateQuantity, getCartTotal } = useCart(); // Use correct properties
+    const { items, removeFromCart, updateQuantity, getCartTotal } = useCart(); 
     const navigate = useNavigate();
     
     const handleCheckout = () => {
       toast.success('Checkout process would start here');
     };
     
-    if (items.length === 0) { // Use `items` instead of `cartItems`
+    if (items.length === 0) { 
       return (
         <div className="min-h-screen bg-[#F9F7F5]">
           <Navbar />

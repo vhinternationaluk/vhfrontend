@@ -9,10 +9,10 @@ import { ChevronRight } from 'lucide-react';
 import { CardDescription } from '@/components/ui/card';
 
 const Index = () => {
-  // Get non-featured products for the grid
+  // it is filtering outt the featured products formm the product list
   const regularProducts = products.filter(p => !p.featured);
   
-  // Group products by category
+  // it is  Grouping  products by  their categoryy......
   const categories = [...new Set(products.map(p => p.category))];
   
   return (
