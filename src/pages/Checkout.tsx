@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import Navbar from "@/components/Navbar";
 
+import invoicePDF from "@/data/Assests/invoice.pdf";
+
 interface FormData {
   firstName: string;
   lastName: string;
@@ -46,9 +48,24 @@ const Checkout: React.FC = () => {
     }));
   };
 
+  const downloadInvoicePDF = () => {
+    // Use the imported PDF
+    const link = document.createElement("a");
+    link.href = invoicePDF;
+    link.download = "invoice.pdf";
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically process the payment and save the order
+    
+    // Download the invoice PDF
+    downloadInvoicePDF();
+    
+    // Clear cart and navigate to confirmation page
     clearCart();
     navigate("/order-confirmation");
   };
