@@ -5,14 +5,13 @@ import { Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
 
 const Cart = () => {
     const { items, removeFromCart, updateQuantity, getCartTotal } = useCart(); 
     const navigate = useNavigate();
     
     const handleCheckout = () => {
-      toast.success('Checkout process would start here');
+      navigate('/checkout');
     };
     
     if (items.length === 0) { 
@@ -47,7 +46,7 @@ const Cart = () => {
               {/* Cart Items */}
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-xl p-6 shadow-sm">
-                  {items.map((item) => ( // Use `items` instead of `cartItems`
+                  {items.map((item) => (
                     <div key={item.product.id} className="mb-6 last:mb-0">
                       <div className="flex items-start gap-4">
                         <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -68,7 +67,7 @@ const Cart = () => {
                                 id={`quantity-${item.product.id}`}
                                 className="bg-gray-50 border border-gray-200 rounded-md px-2 py-1 text-sm"
                                 value={item.quantity}
-                                onChange={(e) => updateQuantity(item.product.id, parseInt(e.target.value))} // Use `updateQuantity`
+                                onChange={(e) => updateQuantity(item.product.id, parseInt(e.target.value))}
                               >
                                 {[...Array(10)].map((_, i) => (
                                   <option key={i + 1} value={i + 1}>{i + 1}</option>
@@ -142,5 +141,4 @@ const Cart = () => {
       </div>
     );
 };
-
-export default Cart;
+ export default Cart

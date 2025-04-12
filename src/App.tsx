@@ -19,6 +19,7 @@ import ManageItems from "./pages/ManageItems";
 import NotFound from "./pages/NotFound";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
+import Checkout from "./pages/Checkout";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { currentUser } = useAuth();
@@ -39,6 +40,7 @@ const AppRoutes = () => {
       <Route path="/contact" element={<Contact />} />
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
