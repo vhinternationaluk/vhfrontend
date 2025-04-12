@@ -42,7 +42,7 @@ const AppRoutes = () => {
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
-      <Route path="/order-confirmation" element={<OrderConfirmation />} /> {/* Add this route for OrderConfirmation */}
+      <Route path="/order-confirmation" element={<OrderConfirmation />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 

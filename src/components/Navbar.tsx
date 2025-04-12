@@ -59,16 +59,29 @@ const Navbar = () => {
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex-shrink-0 -ml-24" style={{ maxHeight: "100%" }}>
+        {/* Mobile menu button - moved to the left for better layout */}
+        <div className="flex md:hidden">
+          <button
+            className="p-2 rounded-full hover:bg-black/5 transition-colors"
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Menu"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
+
+        {/* Logo container - responsive positioning */}
+        <div className="flex-shrink-0 md:-ml-24 absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none">
           <img
             src={Logo}
             alt="VH International"
             width={100}
             height={100}
-            style={{ maxHeight: "100%", objectFit: "contain" }}
+            className="max-h-full object-contain"
           />
         </div>
 
+        {/* Desktop navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link
             to="/"
@@ -96,6 +109,7 @@ const Navbar = () => {
           </Link>
         </nav>
 
+        {/* User and cart actions */}
         <div className="flex items-center space-x-4">
           {currentUser ? (
             <DropdownMenu>
@@ -186,13 +200,7 @@ const Navbar = () => {
             )}
           </Link>
 
-          <button
-            className="p-2 rounded-full hover:bg-black/5 transition-colors md:hidden"
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Menu"
-          >
-            <Menu size={20} />
-          </button>
+          {/* Hamburger menu button moved to the left side */}
         </div>
       </div>
 

@@ -61,11 +61,7 @@ const Checkout: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Download the invoice PDF
     downloadInvoicePDF();
-    
-    // Clear cart and navigate to confirmation page
     clearCart();
     navigate("/order-confirmation");
   };
@@ -146,8 +142,6 @@ const Checkout: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            {/* Checkout Form */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
