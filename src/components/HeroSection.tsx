@@ -28,9 +28,8 @@ const HeroSection = () => {
             className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight mb-6 animate-fade-in"
             style={{ animationDelay: "200ms" }}
           >
-            Furniture for
-            <br />
-            modern living
+            Handmade Brass <br />
+            Endless Grace
           </h1>
           <p
             className="text-lg md:text-xl text-black/70 max-w-2xl mb-8 animate-fade-in"

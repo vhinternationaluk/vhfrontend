@@ -1,30 +1,19 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useItems, Item } from "@/context/ItemContext";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
+import { Plus, Pencil, Trash2, Upload, X, ShoppingBag, Loader2 } from "lucide-react";
 import {
-  Plus,
-  Pencil,
-  Trash2,
-  Upload,
-  X,
-  ShoppingBag,
-  Loader2,
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,205 +28,186 @@ import {
 import { fileToBase64, validateImageFile } from "@/utils/fileUtils";
 import { toast } from "@/components/ui/use-toast";
 
+// Form fields component outside of main component
+const ItemFormFields = ({ formData, setFormData, imagePreview, setImagePreview, imageFile, setImageFile, editingItem }) => {
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }, [setFormData]);
+
+  const handleImageChange = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      toast({
+        title: "Invalid image",
+        description: validation.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setImageFile(file);
+    try {
+      const base64 = await fileToBase64(file);
+      setImagePreview(base64);
+      setFormData(prev => ({ ...prev, image: base64 }));
+    } catch (error) {
+      console.error("Error converting image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process image",
+        variant: "destructive",
+      });
+    }
+  }, [setFormData, setImagePreview, setImageFile]);
+
+  const removeImage = useCallback(() => {
+    setImagePreview("");
+    setFormData(prev => ({ ...prev, image: "" }));
+    setImageFile(null);
+  }, [setFormData, setImagePreview, setImageFile]);
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="item-name">Name *</Label>
+        <Input
+          id="item-name"
+          name="name"
+          value={formData.name}
+          onChange={handleInputChange}
+          placeholder="Item name"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="item-description">Description</Label>
+        <Textarea
+          id="item-description"
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          placeholder="Item description"
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="item-price">Price (₹) *</Label>
+          <Input
+            id="item-price"
+            name="price"
+            type="number"
+            value={formData.price}
+            onChange={handleInputChange}
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="item-category">Category *</Label>
+          <Input
+            id="item-category"
+            name="category"
+            value={formData.category}
+            onChange={handleInputChange}
+            placeholder="Category"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="item-image">Image {!editingItem && '*'}</Label>
+        <div className="flex items-center gap-4">
+          <label
+            htmlFor="item-image-upload"
+            className="flex items-center justify-center w-full h-12 px-4 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-400 transition-colors"
+          >
+            <Upload size={18} className="mr-2" />
+            <span>{imageFile ? imageFile.name : "Upload image"}</span>
+            <input
+              id="item-image-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </label>
+          {imagePreview && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={removeImage}
+            >
+              <X size={18} />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {imagePreview && (
+        <div className="mt-4 border rounded-md overflow-hidden w-full max-w-xs">
+          <img src={imagePreview} alt="Preview" className="w-full h-auto object-cover" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ManageItems = () => {
-  const { getUserItems, addItem, updateItem, deleteItem, isLoading } =
-    useItems();
-  const navigate = useNavigate();
+  const { getUserItems, addItem, updateItem, deleteItem, isLoading } = useItems();
   const userItems = getUserItems();
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [editingItem, setEditingItem] = useState<Item | null>(null);
-
-  // Separate form states for add and edit
-  const [addFormData, setAddFormData] = useState({
+  const [editingItem, setEditingItem] = useState(null);
+  const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
     category: "",
     image: "",
   });
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageFile, setImageFile] = useState(null);
 
-  const [editFormData, setEditFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    image: "",
-  });
+  const resetForm = useCallback(() => {
+    setFormData({ name: "", description: "", price: "", category: "", image: "" });
+    setImagePreview("");
+    setImageFile(null);
+    setEditingItem(null);
+  }, []);
 
-  // Separate image preview states
-  const [addImagePreview, setAddImagePreview] = useState("");
-  const [editImagePreview, setEditImagePreview] = useState("");
-  const [addImageFile, setAddImageFile] = useState<File | null>(null);
-  const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const openAddSheet = useCallback(() => {
+    resetForm();
+    setIsSheetOpen(true);
+  }, [resetForm]);
 
-  // Reset forms
-  const resetAddForm = () => {
-    setAddFormData({
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      image: "",
-    });
-    setAddImagePreview("");
-    setAddImageFile(null);
-  };
-
-  const resetEditForm = () => {
-    setEditFormData({
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      image: "",
-    });
-    setEditImagePreview("");
-    setEditImageFile(null);
-  };
-
-  const handleAddImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      toast({
-        title: "Invalid image",
-        description: validation.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setAddImageFile(file);
-    try {
-      const base64 = await fileToBase64(file);
-      setAddImagePreview(base64);
-      setAddFormData(prev => ({ ...prev, image: base64 }));
-    } catch (error) {
-      console.error("Error converting image to base64:", error);
-      toast({
-        title: "Error",
-        description: "Failed to process image",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleEditImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      toast({
-        title: "Invalid image",
-        description: validation.message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setEditImageFile(file);
-    try {
-      const base64 = await fileToBase64(file);
-      setEditImagePreview(base64);
-      setEditFormData(prev => ({ ...prev, image: base64 }));
-    } catch (error) {
-      console.error("Error converting image to base64:", error);
-      toast({
-        title: "Error",
-        description: "Failed to process image",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Separate input handlers
-  const handleAddInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setAddFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleEditInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setEditFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleAddItem = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      !addFormData.name ||
-      !addFormData.price ||
-      !addFormData.category ||
-      !addFormData.image
-    ) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields and upload an image",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      await addItem({
-        name: addFormData.name,
-        description: addFormData.description,
-        price: parseFloat(addFormData.price),
-        category: addFormData.category.toLowerCase(),
-        image: addFormData.image,
-      });
-
-      setIsAddDialogOpen(false);
-      resetAddForm();
-    } catch (error) {
-      console.error("Error adding item:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add item",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleEditClick = (item: Item) => {
+  const openEditSheet = useCallback((item) => {
     setEditingItem(item);
-    setEditFormData({
+    setFormData({
       name: item.name,
       description: item.description,
       price: item.price.toString(),
       category: item.category,
       image: item.image,
     });
-    setEditImagePreview(item.image);
-    setIsEditDialogOpen(true);
-  };
+    setImagePreview(item.image);
+    setIsSheetOpen(true);
+  }, []);
 
-  const handleUpdateItem = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    if (
-      !editingItem ||
-      !editFormData.name ||
-      !editFormData.price ||
-      !editFormData.category
-    ) {
+    if (!formData.name || !formData.price || !formData.category || (!formData.image && !editingItem)) {
       toast({
         title: "Missing fields",
         description: "Please fill in all required fields",
@@ -248,30 +218,35 @@ const ManageItems = () => {
 
     setIsProcessing(true);
     try {
-      await updateItem(editingItem.id, {
-        name: editFormData.name,
-        description: editFormData.description,
-        price: parseFloat(editFormData.price),
-        category: editFormData.category.toLowerCase(),
-        ...(editFormData.image !== editingItem.image ? { image: editFormData.image } : {}),
-      });
+      const itemData = {
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category.toLowerCase(),
+        ...(formData.image && { image: formData.image }),
+      };
 
-      setIsEditDialogOpen(false);
-      resetEditForm();
-      setEditingItem(null);
+      if (editingItem) {
+        await updateItem(editingItem.id, itemData);
+      } else {
+        await addItem({ ...itemData, image: formData.image });
+      }
+
+      setIsSheetOpen(false);
+      resetForm();
     } catch (error) {
-      console.error("Error updating item:", error);
+      console.error("Error saving item:", error);
       toast({
         title: "Error",
-        description: "Failed to update item",
+        description: `Failed to ${editingItem ? 'update' : 'add'} item`,
         variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [formData, editingItem, addItem, updateItem, resetForm]);
 
-  const handleDeleteItem = async (id: string) => {
+  const handleDelete = useCallback(async (id) => {
     try {
       await deleteItem(id);
     } catch (error) {
@@ -282,208 +257,12 @@ const ManageItems = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [deleteItem]);
 
-  // Separate form field components
-  const AddItemFormFields = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Name *</Label>
-        <Input
-          id="name"
-          name="name"
-          value={addFormData.name}
-          onChange={handleAddInputChange}
-          placeholder="Item name"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          value={addFormData.description}
-          onChange={handleAddInputChange}
-          placeholder="Item description"
-          rows={3}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="price">Price (₹) *</Label>
-          <Input
-            id="price"
-            name="price"
-            type="number"
-            value={addFormData.price}
-            onChange={handleAddInputChange}
-            placeholder="0.00"
-            min="0"
-            step="0.01"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="category">Category *</Label>
-          <Input
-            id="category"
-            name="category"
-            value={addFormData.category}
-            onChange={handleAddInputChange}
-            placeholder="Category"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="image">Image *</Label>
-        <div className="flex items-center gap-4">
-          <label
-            htmlFor="add-image-upload"
-            className="flex items-center justify-center w-full h-12 px-4 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-400 transition-colors"
-          >
-            <Upload size={18} className="mr-2" />
-            <span>{addImageFile ? addImageFile.name : "Upload image"}</span>
-            <input
-              id="add-image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleAddImageChange}
-              className="hidden"
-            />
-          </label>
-          {addImagePreview && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                setAddImagePreview("");
-                setAddFormData(prev => ({ ...prev, image: "" }));
-                setAddImageFile(null);
-              }}
-            >
-              <X size={18} />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {addImagePreview && (
-        <div className="mt-4 border rounded-md overflow-hidden w-full max-w-xs mx-auto">
-          <img
-            src={addImagePreview}
-            alt="Preview"
-            className="w-full h-auto object-cover"
-          />
-        </div>
-      )}
-    </div>
-  );
-
-  const EditItemFormFields = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Name *</Label>
-        <Input
-          id="name"
-          name="name"
-          value={editFormData.name}
-          onChange={handleEditInputChange}
-          placeholder="Item name"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          value={editFormData.description}
-          onChange={handleEditInputChange}
-          placeholder="Item description"
-          rows={3}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="price">Price (₹) *</Label>
-          <Input
-            id="price"
-            name="price"
-            type="number"
-            value={editFormData.price}
-            onChange={handleEditInputChange}
-            placeholder="0.00"
-            min="0"
-            step="0.01"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="category">Category *</Label>
-          <Input
-            id="category"
-            name="category"
-            value={editFormData.category}
-            onChange={handleEditInputChange}
-            placeholder="Category"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="image">Image *</Label>
-        <div className="flex items-center gap-4">
-          <label
-            htmlFor="edit-image-upload"
-            className="flex items-center justify-center w-full h-12 px-4 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-400 transition-colors"
-          >
-            <Upload size={18} className="mr-2" />
-            <span>{editImageFile ? editImageFile.name : "Upload image"}</span>
-            <input
-              id="edit-image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleEditImageChange}
-              className="hidden"
-            />
-          </label>
-          {editImagePreview && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                setEditImagePreview("");
-                setEditFormData(prev => ({ ...prev, image: editingItem?.image || "" }));
-                setEditImageFile(null);
-              }}
-            >
-              <X size={18} />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {editImagePreview && (
-        <div className="mt-4 border rounded-md overflow-hidden w-full max-w-xs mx-auto">
-          <img
-            src={editImagePreview}
-            alt="Preview"
-            className="w-full h-auto object-cover"
-          />
-        </div>
-      )}
-    </div>
-  );
+  const closeSheet = useCallback(() => {
+    setIsSheetOpen(false);
+    resetForm();
+  }, [resetForm]);
 
   return (
     <div className="min-h-screen bg-[#F9F7F5]">
@@ -499,52 +278,16 @@ const ManageItems = () => {
           >
             <div>
               <h1 className="text-3xl font-medium">Manage Items</h1>
-              <p className="text-black/70 mt-1">
-                Add, edit, and remove items that you want to sell
-              </p>
+              <p className="text-black/70 mt-1">Add, edit, and remove items that you want to sell</p>
             </div>
 
-            <Dialog 
-              open={isAddDialogOpen} 
-              onOpenChange={setIsAddDialogOpen}
-              key="add-dialog"
+            <Button 
+              className="bg-black text-white hover:bg-black/80 transition-colors flex items-center gap-2"
+              onClick={openAddSheet}
             >
-              <DialogTrigger asChild>
-                <Button className="bg-black text-white hover:bg-black/80 transition-colors flex items-center gap-2">
-                  <Plus size={16} />
-                  <span>Add New Item</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[550px]">
-                <DialogHeader>
-                  <DialogTitle>Add New Item</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleAddItem}>
-                  <div className="py-4">
-                    <AddItemFormFields />
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        resetAddForm();
-                        setIsAddDialogOpen(false);
-                      }}
-                      disabled={isProcessing}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={isProcessing}>
-                      {isProcessing && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      Add Item
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+              <Plus size={16} />
+              <span>Add New Item</span>
+            </Button>
           </motion.div>
 
           <motion.div
@@ -563,21 +306,11 @@ const ManageItems = () => {
                 <table className="w-full table-auto">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                        Image
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                        Name
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                        Category
-                      </th>
-                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                        Price
-                      </th>
-                      <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
-                        Actions
-                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Image</th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Name</th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Category</th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">Price</th>
+                      <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -585,20 +318,12 @@ const ManageItems = () => {
                       <tr key={item.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="w-16 h-16 rounded-md overflow-hidden">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-full h-full object-cover"
-                            />
+                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {item.name}
-                          </div>
-                          <div className="text-xs text-gray-500 truncate max-w-[200px]">
-                            {item.description}
-                          </div>
+                          <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                          <div className="text-xs text-gray-500 truncate max-w-[200px]">{item.description}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-xs bg-amber-50 text-amber-800 px-2 py-1 rounded-full capitalize">
@@ -606,9 +331,7 @@ const ManageItems = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium">
-                            ₹{item.price}
-                          </div>
+                          <div className="text-sm font-medium">₹{item.price}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end space-x-2">
@@ -616,35 +339,28 @@ const ManageItems = () => {
                               variant="ghost"
                               size="icon"
                               className="text-gray-500 hover:text-black"
-                              onClick={() => handleEditClick(item)}
+                              onClick={() => openEditSheet(item)}
                             >
                               <Pencil size={16} />
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-gray-500 hover:text-red-500"
-                                >
+                                <Button variant="ghost" size="icon" className="text-gray-500 hover:text-red-500">
                                   <Trash2 size={16} />
                                 </Button>
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    Delete Item
-                                  </AlertDialogTitle>
+                                  <AlertDialogTitle>Delete Item</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Are you sure you want to delete "{item.name}
-                                    "? This action cannot be undone.
+                                    Are you sure you want to delete "{item.name}"? This action cannot be undone.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                                   <AlertDialogAction
                                     className="bg-red-500 text-white hover:bg-red-600"
-                                    onClick={() => handleDeleteItem(item.id)}
+                                    onClick={() => handleDelete(item.id)}
                                   >
                                     Delete
                                   </AlertDialogAction>
@@ -665,12 +381,11 @@ const ManageItems = () => {
                 </div>
                 <p className="text-lg font-medium mb-2">No items yet</p>
                 <p className="text-black/70 mb-6 text-center max-w-md">
-                  You haven't added any items yet. Click the "Add New Item"
-                  button to get started.
+                  You haven't added any items yet. Click the "Add New Item" button to get started.
                 </p>
                 <Button
                   className="bg-black text-white hover:bg-black/80 transition-colors"
-                  onClick={() => setIsAddDialogOpen(true)}
+                  onClick={openAddSheet}
                 >
                   Add Your First Item
                 </Button>
@@ -680,41 +395,40 @@ const ManageItems = () => {
         </div>
       </div>
 
-      <Dialog 
-        open={isEditDialogOpen} 
-        onOpenChange={setIsEditDialogOpen}
-        key="edit-dialog"
-      >
-        <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleUpdateItem}>
-            <div className="py-4">
-              <EditItemFormFields />
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent className="sm:max-w-[540px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</SheetTitle>
+          </SheetHeader>
+          <form onSubmit={handleSubmit} className="mt-6">
+            <div className="space-y-6">
+              <ItemFormFields 
+                formData={formData}
+                setFormData={setFormData}
+                imagePreview={imagePreview}
+                setImagePreview={setImagePreview}
+                imageFile={imageFile}
+                setImageFile={setImageFile}
+                editingItem={editingItem}
+              />
             </div>
-            <DialogFooter>
+            <SheetFooter className="mt-8 pt-4 border-t">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  resetEditForm();
-                  setIsEditDialogOpen(false);
-                }}
+                onClick={closeSheet}
                 disabled={isProcessing}
               >
                 Cancel
               </Button>
               <Button type="submit" disabled={isProcessing}>
-                {isProcessing && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Update Item
+                {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {editingItem ? 'Update Item' : 'Add Item'}
               </Button>
-            </DialogFooter>
+            </SheetFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
