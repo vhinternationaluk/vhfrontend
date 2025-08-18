@@ -1,44 +1,94 @@
-import React, { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, User, Mail, Camera } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Navbar from '@/components/Navbar';
-import { updateProfile, updateEmail } from 'firebase/auth';
-import { useToast } from '@/components/ui/use-toast';
+import React, { useState, useRef } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Loader2, User, Mail, Camera } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Navbar from "@/components/Navbar";
+import { updateProfile, updateEmail } from "firebase/auth";
+import { useToast } from "@/components/ui/use-toast";
 
 const Profile = () => {
   const { currentUser } = useAuth();
   const { toast } = useToast();
-  const [displayName, setDisplayName] = useState(currentUser?.displayName || '');
-  const [email, setEmail] = useState(currentUser?.email || '');
+  const [displayName, setDisplayName] = useState(
+    currentUser?.displayName || ""
+  );
+  const [email, setEmail] = useState(currentUser?.email || "");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [profileImage, setProfileImage] = useState(currentUser?.photoURL || "");
+  const [imageFile, setImageFile] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setImageFile(file);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result;
+        if (typeof result === "string") {
+          setProfileImage(result);
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      toast({
+        title: "Invalid file",
+        description: "Please select a valid image file.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleUpdateProfile = async () => {
     if (!currentUser) return;
-    
+
     try {
       setIsUpdating(true);
-      
-      // Update display name if changed
-      if (displayName !== currentUser.displayName) {
-        await updateProfile(currentUser, { displayName });
+
+      let photoURL = currentUser.photoURL;
+
+      if (imageFile) {
+        photoURL = profileImage;
       }
-      
-      // Update email if changed
+
+      const updates: { displayName?: string; photoURL?: string } = {};
+      if (displayName !== currentUser.displayName) {
+        updates.displayName = displayName;
+      }
+      if (photoURL !== currentUser.photoURL) {
+        updates.photoURL = photoURL;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await updateProfile(currentUser, updates);
+      }
+
       if (email !== currentUser.email) {
         await updateEmail(currentUser, email);
       }
-      
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Update failed",
         description: error.message,
@@ -52,21 +102,19 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <Navbar />
-      
+
       <div className="pt-24 pb-16 px-4 sm:px-6 md:px-8 max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          <h1 className="text-3xl font-medium text-center mb-8">My Account</h1>
-          
           <Tabs defaultValue="profile" className="w-full max-w-3xl mx-auto">
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="profile">
               <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-md">
                 <CardHeader>
@@ -75,27 +123,37 @@ const Profile = () => {
                     Update your account details and profile information
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-6">
                   <div className="flex justify-center mb-6">
                     <div className="relative">
                       <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-2 border-white shadow-md">
-                        {currentUser?.photoURL ? (
-                          <img 
-                            src={currentUser.photoURL} 
-                            alt="Profile" 
+                        {profileImage ? (
+                          <img
+                            src={profileImage}
+                            alt="Profile"
                             className="w-full h-full object-cover"
                           />
                         ) : (
                           <User className="h-12 w-12 text-gray-400" />
                         )}
                       </div>
-                      <button className="absolute -bottom-1 -right-1 bg-black text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors">
+                      <button
+                        onClick={handleCameraClick}
+                        className="absolute -bottom-1 -right-1 bg-black text-white p-2 rounded-full shadow-md hover:bg-gray-800 transition-colors"
+                      >
                         <Camera className="h-4 w-4" />
                       </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="displayName">Display Name</Label>
                     <div className="relative">
@@ -108,7 +166,7 @@ const Profile = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <div className="relative">
@@ -123,10 +181,10 @@ const Profile = () => {
                     </div>
                   </div>
                 </CardContent>
-                
+
                 <CardFooter>
-                  <Button 
-                    onClick={handleUpdateProfile} 
+                  <Button
+                    onClick={handleUpdateProfile}
                     disabled={isUpdating}
                     className="ml-auto bg-black hover:bg-black/80"
                   >
@@ -142,7 +200,7 @@ const Profile = () => {
                 </CardFooter>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="security">
               <Card className="border-0 shadow-lg bg-white/90 backdrop-blur-md">
                 <CardHeader>
@@ -151,24 +209,26 @@ const Profile = () => {
                     Manage your password and account security
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="password">Current Password</Label>
                     <Input id="password" type="password" />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="newPassword">New Password</Label>
                     <Input id="newPassword" type="password" />
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
                     <Input id="confirmPassword" type="password" />
                   </div>
                 </CardContent>
-                
+
                 <CardFooter>
                   <Button className="ml-auto bg-black hover:bg-black/80">
                     Update Password
