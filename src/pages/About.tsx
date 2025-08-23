@@ -87,32 +87,28 @@ const About = () => {
           <div>
             <h2 className="text-2xl font-medium mb-8 text-center animate-fade-in">Our Team</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
               {[
                  {
-                  name: "Mr. Haider Ali",
+                  name: "Mr. Vikas Chaudhary",
                   role: "Founder & Owner",
                   image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
                 },
                 {
-                  name: "Elena Rodriguez",
+                  name: "Mr. Haider Ali",
                   role: "Lead Designer",
                   image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=776&q=80"
                 },
                 {
-                  name: "Sophia Kim",
-                  role: "Sustainability Director",
+                  name: "Sumit Chaudhary",
+                  role: "Chief Technical Officer",
                   image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1361&q=80"
                 },
-                {
-                  name: "James Watson",
-                  role: "Head of Operations",
-                  image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80"
-                }
+                
               ].map((member, index) => (
                 <div 
                   key={member.name}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm animate-fade-in"
+                  className="bg-white rounded-xl overflow-hidden shadow-sm animate-fade-in w-64"
                   style={{ animationDelay: `${100 + (index * 50)}ms` }}
                 >
                   <div className="aspect-square overflow-hidden">

@@ -221,13 +221,13 @@ const Login = () => {
                   <form onSubmit={handleLogin}>
                     <CardContent className="space-y-4 px-0">
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">Email / Username</Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                           <Input
                             id="email"
-                            type="email"
-                            placeholder="Enter Email"
+                            type="text"
+                            placeholder="Enter Email or Username"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="pl-10"

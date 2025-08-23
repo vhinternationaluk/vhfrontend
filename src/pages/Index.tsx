@@ -175,8 +175,9 @@ const Index = () => {
                 />
 
                 <CardDescription className="mt-6 text-sm text-gray-600 leading-relaxed">
-                  400 University Drive Suite 200 Coral Gables, <br />
-                  FL 33134 UK
+                  Asdullapur, Sultanpur Dost, Moradabad
+                  <br />
+                  244001, Uttar Pradesh
                 </CardDescription>
               </div>
             </div>
@@ -189,22 +190,6 @@ const Index = () => {
                     className="text-black/70 hover:text-amber-700 transition-colors"
                   >
                     Our Story
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/about"
-                    className="text-black/70 hover:text-amber-700 transition-colors"
-                  >
-                    Craftsmanship
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="about"
-                    className="text-black/70 hover:text-amber-700 transition-colors"
-                  >
-                    Sustainability
                   </a>
                 </li>
                 <li>
@@ -222,7 +207,7 @@ const Index = () => {
               <ul className="space-y-2">
                 <li>
                   <a
-                    href="/orders"
+                    href="/delivery"
                     className="text-black/70 hover:text-amber-700 transition-colors"
                   >
                     Delivery
@@ -234,22 +219,6 @@ const Index = () => {
                     className="text-black/70 hover:text-amber-700 transition-colors"
                   >
                     Returns
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/contact"
-                    className="text-black/70 hover:text-amber-700 transition-colors"
-                  >
-                    Care Guide
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/contact"
-                    className="text-black/70 hover:text-amber-700 transition-colors"
-                  >
-                    FAQ
                   </a>
                 </li>
               </ul>
@@ -273,7 +242,7 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-amber-100 text-center md:text-right">
+          <div className="pt-6 border-t border-amber-100 text-center md:text-center">
             <p className="text-black/50 text-sm">
               © {new Date().getFullYear()} VH International. All rights
               reserved.

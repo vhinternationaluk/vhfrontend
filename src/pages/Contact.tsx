@@ -94,8 +94,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-medium mb-1">Visit Us</h3>
-                      <p className="text-black/70">400 University Drive Suite 200 Coral Gables</p>
-                      <p className="text-black/70">FL 33134 UK</p>
+                      <p className="text-black/70">Asdullapur, Sultanpur dost, Moradabad</p>
+                      <p className="text-black/70">244001, Uttar Pradesh</p>
                     </div>
                   </div>
                 </div>

@@ -11,6 +11,7 @@ import {
   Package,
   UserCircle,
   ShoppingBag,
+  Shield,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -29,7 +30,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const Navbar = () => {
   const navigate = useNavigate();
   const { getItemCount } = useCart();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, isAdmin, userRole } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -113,7 +114,11 @@ const Navbar = () => {
                     className="p-2 rounded-full hover:bg-black/5 transition-colors relative focus:outline-none"
                     aria-label="User menu"
                   >
-                    <User className="h-5 w-5 text-gray-600 hover:text-[#d4a000]" />
+                    {isAdmin ? (
+                      <Shield className="h-5 w-5 text-red-600 hover:text-red-700" />
+                    ) : (
+                      <User className="h-5 w-5 text-gray-600 hover:text-[#d4a000]" />
+                    )}
                     <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full"></span>
                   </motion.button>
                 </DropdownMenuTrigger>
@@ -122,9 +127,16 @@ const Navbar = () => {
                   className="w-56 p-2 bg-white/90 backdrop-blur-lg border border-gray-100 shadow-lg rounded-lg"
                 >
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {currentUser.displayName || currentUser.email}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {currentUser.displayName || currentUser.email}
+                      </p>
+                      {isAdmin && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Admin
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-gray-500 truncate mt-1">
                       {currentUser.email}
                     </p>
@@ -143,13 +155,18 @@ const Navbar = () => {
                     <Package className="h-4 w-4" />
                     <span>My Orders</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
-                    onClick={() => navigate("/manage-items")}
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    <span>Manage Items</span>
-                  </DropdownMenuItem>
+                  
+                  {/* Show Manage Items only for Admin */}
+                  {isAdmin && (
+                    <DropdownMenuItem
+                      className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
+                      onClick={() => navigate("/manage-items")}
+                    >
+                      <ShoppingBag className="h-4 w-4" />
+                      <span>Manage Items</span>
+                    </DropdownMenuItem>
+                  )}
+                  
                   <DropdownMenuSeparator className="my-1 bg-gray-100" />
                   <DropdownMenuItem
                     className="flex items-center gap-2 py-2 text-red-500 cursor-pointer hover:bg-red-50 transition-colors rounded-md"
@@ -274,9 +291,16 @@ const Navbar = () => {
               {currentUser && (
                 <>
                   <div className="pt-4">
-                    <p className="text-sm text-gray-500 font-medium mb-4">
-                      Account
-                    </p>
+                    <div className="flex items-center gap-2 mb-4">
+                      <p className="text-sm text-gray-500 font-medium">
+                        Account
+                      </p>
+                      {isAdmin && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Admin
+                        </span>
+                      )}
+                    </div>
                     <Link
                       to="/profile"
                       className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
@@ -293,14 +317,19 @@ const Navbar = () => {
                       <Package className="h-5 w-5" />
                       My Orders
                     </Link>
-                    <Link
-                      to="/manage-items"
-                      className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <ShoppingBag className="h-5 w-5" />
-                      Manage Items
-                    </Link>
+                    
+                    {/* Show Manage Items only for Admin in mobile menu */}
+                    {isAdmin && (
+                      <Link
+                        to="/manage-items"
+                        className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <ShoppingBag className="h-5 w-5" />
+                        Manage Items
+                      </Link>
+                    )}
+                    
                     <button
                       className="text-lg font-medium text-red-500 text-left py-2 flex items-center gap-2"
                       onClick={() => {

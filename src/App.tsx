@@ -21,6 +21,8 @@ import Login from "./auth/Login";
 import Register from "./auth/Register";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation"
+import Payment from "./pages/Payment";
+import DeliveryPage from "./pages/Delivery";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { currentUser } = useAuth();
@@ -42,7 +44,9 @@ const AppRoutes = () => {
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
+      <Route path="/payment" element={<Payment />} />
       <Route path="/order-confirmation" element={<OrderConfirmation />} />
+      <Route path="/delivery" element={<DeliveryPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
