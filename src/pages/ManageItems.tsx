@@ -21,14 +21,12 @@ import {
   Eye,
   Check,
   Clock,
-  AlertCircle,
   TrendingUp,
   Calendar,
   Mail,
   Phone,
   MapPin,
   CreditCard,
-  Star,
 } from "lucide-react";
 import {
   Sheet,
@@ -58,15 +56,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import logo from "@/data/Assests/logo.png"
 
 // Mock data for demonstration
 const mockProducts = [
   {
     id: 1,
-    name: "Wireless Headphones",
-    description: "High-quality wireless headphones with noise cancellation",
+    name: "Bras Lamp",
+    description: "High-quality brass lamp with copper finish",
     price: 4999,
-    category: "electronics",
+    category: "Living Room",
     image:
       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5IZWFkcGhvbmVzPC90ZXh0Pjwvc3ZnPg==",
     status: "active",
@@ -75,7 +74,7 @@ const mockProducts = [
   },
   {
     id: 2,
-    name: "Coffee Mug",
+    name: "Brass Coffee Mug",
     description: "Premium ceramic coffee mug",
     price: 299,
     category: "home",
@@ -87,10 +86,10 @@ const mockProducts = [
   },
   {
     id: 3,
-    name: "Running Shoes",
-    description: "Comfortable running shoes for daily exercise",
+    name: " Brass Planter",
+    description: "Captivating planters for your indoor plants",
     price: 2999,
-    category: "sports",
+    category: "Decoration",
     image:
       "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5TaG9lczwvdGV4dD48L3N2Zz4=",
     status: "inactive",
@@ -102,9 +101,9 @@ const mockProducts = [
 const mockCategories = [
   {
     id: 1,
-    name: "Electronics",
+    name: "Brass Items",
     slug: "electronics",
-    description: "Electronic devices and gadgets",
+    description: "Electronic brass devices and gadgets",
     productCount: 12,
     status: "active",
   },
@@ -137,12 +136,12 @@ const mockCategories = [
 const mockOrders = [
   {
     id: "ORD001",
-    customerName: "John Doe",
-    customerEmail: "john@example.com",
+    customerName: "Sumit Chaudhary",
+    customerEmail: "sumit29@gmail.com",
     customerPhone: "+91 9876543210",
     items: [
-      { name: "Wireless Headphones", quantity: 1, price: 4999 },
-      { name: "Coffee Mug", quantity: 2, price: 299 },
+      { name: "Wired Brass Gramophones", quantity: 1, price: 4999 },
+      { name: "Brass Coffee Mug", quantity: 2, price: 299 },
     ],
     totalAmount: 5597,
     status: "pending",
@@ -152,10 +151,10 @@ const mockOrders = [
   },
   {
     id: "ORD002",
-    customerName: "Jane Smith",
-    customerEmail: "jane@example.com",
+    customerName: "Shantanu",
+    customerEmail: "shantanu12@gmail.com",
     customerPhone: "+91 8765432109",
-    items: [{ name: "Running Shoes", quantity: 1, price: 2999 }],
+    items: [{ name: "Brass Lamp", quantity: 1, price: 2999 }],
     totalAmount: 2999,
     status: "shipped",
     paymentStatus: "paid",
@@ -724,19 +723,22 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#F9F7F5]">
-     {/* Header */}
+      {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="cursor-pointer" onClick={() => window.location.href = '/'}>
-              <img src="/src/data/Assests/logo.png" alt="Logo" className="h-12 w-auto" />
+            <div
+              className="cursor-pointer"
+              onClick={() => (window.location.href = "/")}
+            >
+              <img src={logo} alt="Logo" className="h-12 w-auto" />
             </div>
             <div className="text-center">
               <h1 className="text-xl font-bold text-gray-900">
                 Admin Dashboard
               </h1>
             </div>
-            <div className="w-12"></div> 
+            <div className="w-12"></div>
           </div>
         </div>
       </div>
