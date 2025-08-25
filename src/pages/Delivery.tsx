@@ -66,21 +66,29 @@ const DeliveryPage = () => {
     });
   });
 
+  const handleContactDelivery = () => {
+    window.location.href = "/contact";
+  };
+
+  const handleViewOrderDetails = () => {
+    window.location.href = "/orders";
+  };
+
   return (
     <div className="min-h-screen bg-[#F9F7F5]">
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-6">
           <div className="flex items-center justify-between">
-            {/* Company Logo */}
-            <div 
-              onClick={() => window.location.href = '/'}
+            {/* Company Logo - Increased Size */}
+            <div
+              onClick={() => (window.location.href = "/")}
               className="cursor-pointer hover:opacity-80 transition-opacity duration-200"
             >
-              <img 
-                src={Logo} 
-                alt="Company Logo" 
-                className="w-16 lg:h-16 object-contain"
+              <img
+                src={Logo}
+                alt="Company Logo"
+                className="w-24 h-24 object-contain"
               />
             </div>
 
@@ -89,7 +97,9 @@ const DeliveryPage = () => {
               <h1 className="text-lg font-medium text-gray-900">
                 Track Your Order
               </h1>
-              <p className="text-sm text-gray-600 mt-1">Order #VH-2025-8901234</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Order #VH-2025-8901234
+              </p>
             </div>
 
             {/* Estimated Delivery */}
@@ -268,10 +278,16 @@ const DeliveryPage = () => {
 
         {/* Action Buttons */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4">
-          <button className="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200">
+          <button
+            onClick={handleContactDelivery}
+            className="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200"
+          >
             Contact Delivery Partner
           </button>
-          <button className="flex-1 bg-white hover:bg-gray-50 text-gray-900 py-3 px-6 rounded-lg font-medium border border-gray-300 transition-colors duration-200">
+          <button
+            onClick={handleViewOrderDetails}
+            className="flex-1 bg-white hover:bg-gray-50 text-gray-900 py-3 px-6 rounded-lg font-medium border border-gray-300 transition-colors duration-200"
+          >
             View Order Details
           </button>
         </div>
