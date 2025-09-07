@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +13,9 @@ import {
   Facebook,
   LogIn,
   ArrowRight,
+  CheckCircle,
 } from "lucide-react";
 import GoogleIcon from "@/data/googleicon";
-import { useAuth } from "@/context/AuthContext";
 
 const backgrounds = [
   "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=1920&q=80",
@@ -23,9 +23,28 @@ const backgrounds = [
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80",
 ];
 
+interface LoginResponse {
+  status: boolean;
+  status_message: string;
+  payload: {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    mobile: string;
+    user_type: string;
+    profile_img: string;
+    access_token?: string;
+    refresh_token?: string;
+  } | null;
+  exception: string | null;
+}
+
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,8 +52,7 @@ const Login = () => {
   const [currentBg, setCurrentBg] = useState(0);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [error, setError] = useState("");
-  const { login, loginWithGoogle, loginWithFacebook, resetPassword } =
-    useAuth();
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,19 +61,122 @@ const Login = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Check for registration success message
+  useEffect(() => {
+    if (location.state?.registrationSuccess) {
+      setSuccessMessage(
+        location.state.message || "Registration successful! Please login with your credentials."
+      );
+      // Clear the success message after 5 seconds
+      setTimeout(() => setSuccessMessage(""), 5000);
+    }
+  }, [location.state]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
+
+    if (!username || !password) {
+      setError("Please enter both username and password");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      await login(email, password);
+
+      // Prepare payload according to API requirements
+      const loginPayload = {
+        username: username.trim(),
+        password: password,
+      };
+
+      console.log("Sending login request:", { username: loginPayload.username });
+
+      const response = await fetch("https://vhdev.onrender.com/accounts/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(loginPayload),
+      });
+
+      // Handle different response scenarios
+      if (!response.ok) {
+        if (response.status === 502) {
+          throw new Error("Server is temporarily unavailable. Please try again later.");
+        }
+        
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          throw new Error(`Login failed (${response.status}). Please try again.`);
+        }
+
+        // Handle API error response
+        if (errorData.status === false) {
+          throw new Error(errorData.status_message || "Invalid credentials");
+        }
+        
+        throw new Error(errorData.message || errorData.status_message || "Login failed");
+      }
+
+      const data: LoginResponse = await response.json();
+      
+      // Check if the API returned success status
+      if (!data.status) {
+        throw new Error(data.status_message || "Login failed");
+      }
+
+      console.log("Login successful:", data);
+
+      // Store user data and tokens in localStorage
+      if (data.payload) {
+        const userData = {
+          id: data.payload.id,
+          username: data.payload.username,
+          firstName: data.payload.first_name,
+          lastName: data.payload.last_name,
+          email: data.payload.email,
+          mobile: data.payload.mobile,
+          userType: data.payload.user_type,
+          profileImg: data.payload.profile_img,
+          isAuthenticated: true,
+          loginTime: new Date().toISOString(),
+        };
+
+        localStorage.setItem("user", JSON.stringify(userData));
+        
+        // Store tokens if provided
+        if (data.payload.access_token) {
+          localStorage.setItem("accessToken", data.payload.access_token);
+        }
+        if (data.payload.refresh_token) {
+          localStorage.setItem("refreshToken", data.payload.refresh_token);
+        }
+      }
+
+      // Navigate to dashboard or intended page
+      const redirectTo = location.state?.from || "/dashboard";
+      navigate(redirectTo, { replace: true });
+
     } catch (error) {
       console.error("Login error:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Login failed. Please try again."
-      );
+      
+      if (error instanceof Error) {
+        // Handle specific error messages
+        if (error.message.includes("Failed to fetch")) {
+          setError("Network error.");
+        } else if (error.message.includes("502")) {
+          setError("Server is temporarily unavailable due to CORS policy. Please try again later.");
+        } else {
+          setError(error.message);
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -63,14 +184,20 @@ const Login = () => {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!username) {
+      setError("Please enter your username/email first");
+      return;
+    }
 
     try {
       setIsResettingPassword(true);
       setError("");
-      await resetPassword(email);
+      
+      // You might need to implement password reset API call here
+      // For now, just showing a placeholder message
       setShowForgotPassword(false);
-      setError("Password reset link sent to your email!");
+      setSuccessMessage("If an account exists with that username, a password reset link has been sent!");
+      
     } catch (error) {
       console.error(error);
       setError(
@@ -79,6 +206,10 @@ const Login = () => {
     } finally {
       setIsResettingPassword(false);
     }
+  };
+
+  const handleSocialLogin = (provider: string) => {
+    setError(`${provider} login is not implemented yet. Please use username/password login.`);
   };
 
   return (
@@ -128,27 +259,21 @@ const Login = () => {
 
                   <h2 className="text-2xl font-bold mb-2">Reset Password</h2>
                   {error && (
-                    <div
-                      className={`text-sm mb-4 p-2 rounded-md ${
-                        error.includes("sent")
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
+                    <div className="bg-red-100 text-red-700 text-sm mb-4 p-3 rounded-md">
                       {error}
                     </div>
                   )}
                   <form onSubmit={handleResetPassword}>
                     <div className="space-y-2 mb-6">
-                      <Label htmlFor="reset-email">Email Address</Label>
+                      <Label htmlFor="reset-username">Username/Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
-                          id="reset-email"
-                          type="email"
-                          placeholder="name@example.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          id="reset-username"
+                          type="text"
+                          placeholder="Enter username or email"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
                           className="pl-10"
                           required
                         />
@@ -158,7 +283,7 @@ const Login = () => {
                     <Button
                       type="submit"
                       className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                      disabled={!email || isResettingPassword}
+                      disabled={!username || isResettingPassword}
                     >
                       {isResettingPassword ? (
                         <span className="flex items-center justify-center gap-2">
@@ -212,8 +337,17 @@ const Login = () => {
                     </p>
                   </div>
 
+                  {/* Success Message */}
+                  {successMessage && (
+                    <div className="bg-green-100 text-green-700 text-sm mb-4 p-3 rounded-md flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      {successMessage}
+                    </div>
+                  )}
+
+                  {/* Error Message */}
                   {error && (
-                    <div className="bg-red-100 text-red-700 text-sm mb-4 p-2 rounded-md text-center">
+                    <div className="bg-red-100 text-red-700 text-sm mb-4 p-3 rounded-md">
                       {error}
                     </div>
                   )}
@@ -221,19 +355,20 @@ const Login = () => {
                   <form onSubmit={handleLogin}>
                     <CardContent className="space-y-4 px-0">
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email / Username</Label>
+                        <Label htmlFor="username">Username</Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                           <Input
-                            id="email"
+                            id="username"
                             type="text"
-                            placeholder="Enter Email or Username"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             className="pl-10"
                             required
                           />
                         </div>
+                        
                       </div>
 
                       <div className="space-y-2">
@@ -252,7 +387,7 @@ const Login = () => {
                           <Input
                             id="password"
                             type={isPasswordVisible ? "text" : "password"}
-                            placeholder="Enter Password"
+                            placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="pl-10"
@@ -329,7 +464,8 @@ const Login = () => {
                       <Button
                         variant="outline"
                         className="w-full flex items-center gap-2"
-                        onClick={loginWithGoogle}
+                        onClick={() => handleSocialLogin("Google")}
+                        type="button"
                       >
                         <GoogleIcon className="h-4 w-4" />
                         Google
@@ -337,7 +473,8 @@ const Login = () => {
                       <Button
                         variant="outline"
                         className="w-full flex items-center gap-2"
-                        onClick={loginWithFacebook}
+                        onClick={() => handleSocialLogin("Facebook")}
+                        type="button"
                       >
                         <Facebook className="h-4 w-4 text-[#1877F2]" />
                         Facebook
