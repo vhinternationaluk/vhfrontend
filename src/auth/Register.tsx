@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Mail,
   Lock,
@@ -15,6 +15,7 @@ import {
   Upload,
   Camera,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const backgrounds = [
   "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=1920&q=80",
@@ -22,24 +23,9 @@ const backgrounds = [
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80",
 ];
 
-interface ApiResponse {
-  status: boolean;
-  status_message: string;
-  payload: {
-    id: number;
-    username: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    mobile: string;
-    user_type: string;
-    profile_img: string;
-  };
-  exception: string | null;
-}
-
 const Register = () => {
-  const navigate = useNavigate();
+  const { registerWithApi } = useAuth();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -77,153 +63,23 @@ const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (
-      !firstName ||
-      !lastName ||
-      !username ||
-      !email ||
-      !password ||
-      !mobile ||
-      !profileImage
-    ) {
-      setError("All fields including profile image are required");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    const mobileRegex = /^\d{10}$/;
-    if (!mobileRegex.test(mobile.replace(/\D/g, ""))) {
-      setError("Please enter a valid 10-digit mobile number");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-
-    const hasNumbers = /\d/.test(password);
-    const containsUsername = password
-      .toLowerCase()
-      .includes(username.toLowerCase());
-
-    if (!containsUsername || !hasNumbers) {
-      setError(
-        "Password must contain your username and numbers (e.g., yourusername@1235678)"
-      );
-      return;
-    }
-
-    const hasSpecialChar = /[@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
-      password
-    );
-    if (!hasSpecialChar) {
-      setError("Password should contain at least one special character");
-      return;
-    }
+    setIsSubmitting(true);
 
     try {
-      setIsSubmitting(true);
-
-      // Prepare payload according to API requirements
-      const formData = new FormData();
-      formData.append("username", username.trim());
-      formData.append("first_name", firstName.trim());
-      formData.append("last_name", lastName.trim());
-      formData.append("email", email.trim().toLowerCase());
-      formData.append("password", password);
-      formData.append("mobile", mobile.replace(/\D/g, ""));
-      formData.append("profile_img", profileImage);
-
-      console.log("Sending registration data with profile image");
-
-      const response = await fetch(
-        "https://vhdev.onrender.com/accounts/register/",
-        {
-          method: "POST",
-          body: formData, // Remove Content-Type header for FormData
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 502) {
-          throw new Error(
-            "Server is temporarily unavailable. Please try again later."
-          );
-        }
-
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          throw new Error(
-            `Registration failed (${response.status}). Please try again.`
-          );
-        }
-
-        if (errorData.status === false) {
-          throw new Error(errorData.status_message || "Registration failed");
-        }
-
-        throw new Error(
-          errorData.message || errorData.status_message || "Registration failed"
-        );
-      }
-
-      const data: ApiResponse = await response.json();
-
-      if (!data.status) {
-        throw new Error(data.status_message || "Registration failed");
-      }
-
-      console.log("Registration successful:", data);
-
-      if (data.payload) {
-        localStorage.setItem(
-          "registeredUser",
-          JSON.stringify({
-            id: data.payload.id,
-            username: data.payload.username,
-            firstName: data.payload.first_name,
-            lastName: data.payload.last_name,
-            email: data.payload.email,
-            mobile: data.payload.mobile,
-            userType: data.payload.user_type,
-            profileImg: data.payload.profile_img,
-          })
-        );
-      }
-
-      navigate("/login", {
-        state: {
-          registrationSuccess: true,
-          message: data.status_message,
-          username: data.payload?.username,
-        },
+      await registerWithApi({
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+        mobile,
+        profileImage: profileImage!,
       });
     } catch (error) {
-      console.error("Registration error:", error);
-
       if (error instanceof Error) {
-        if (error.message.includes("Failed to fetch")) {
-          setError(
-            "Network error."
-          );
-        } else if (error.message.includes("502")) {
-          setError(
-            "Server is temporarily unavailable due to CORS policy. Please try again later."
-          );
-        } else {
-          setError(error.message);
-        }
+        setError(error.message);
       } else {
-        setError("An unexpected error occurred. Please try again.");
+        setError("Registration failed. Please try again.");
       }
     } finally {
       setIsSubmitting(false);
@@ -434,7 +290,7 @@ const Register = () => {
                     <Input
                       id="password"
                       type={isPasswordVisible ? "text" : "password"}
-                      placeholder="e.g., shantanu@1235678"
+                      placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-12 pr-14 h-14 text-base border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
@@ -454,8 +310,7 @@ const Register = () => {
                     </button>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">
-                    Password must include your username, numbers, and special
-                    characters
+                    Password must be at least 8 characters long
                   </p>
                 </div>
 

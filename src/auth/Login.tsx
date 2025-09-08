@@ -14,32 +14,16 @@ import {
   LogIn,
   ArrowRight,
   CheckCircle,
+  Shield,
 } from "lucide-react";
 import GoogleIcon from "@/data/googleicon";
+import { useAuth } from "@/context/AuthContext";
 
 const backgrounds = [
   "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&w=1920&q=80",
   "https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&w=1920&q=80",
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80",
 ];
-
-interface LoginResponse {
-  status: boolean;
-  status_message: string;
-  payload: {
-    id: number;
-    username: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    mobile: string;
-    user_type: string;
-    profile_img: string;
-    access_token?: string;
-    refresh_token?: string;
-  } | null;
-  exception: string | null;
-}
 
 const Login = () => {
   const navigate = useNavigate();
@@ -54,6 +38,18 @@ const Login = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Use AuthContext
+  const {
+    login,
+    loginWithGoogle,
+    loginWithFacebook,
+    resetPassword,
+    currentUser,
+    loading,
+    isAdmin,
+    userRole,
+  } = useAuth();
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBg((prev) => (prev + 1) % backgrounds.length);
@@ -61,13 +57,21 @@ const Login = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && currentUser) {
+      navigate("/", { replace: true });
+    }
+  }, [currentUser, loading, navigate]);
+
   // Check for registration success message
   useEffect(() => {
     if (location.state?.registrationSuccess) {
       setSuccessMessage(
-        location.state.message || "Registration successful! Please login with your credentials."
+        location.state.message ||
+          "Registration successful! Please login with your credentials."
       );
-      // Clear the success message after 5 seconds
+      // Clear the message after 5 seconds
       setTimeout(() => setSuccessMessage(""), 5000);
     }
   }, [location.state]);
@@ -78,107 +82,90 @@ const Login = () => {
     setSuccessMessage("");
 
     if (!username || !password) {
-      setError("Please enter both username and password");
+      setError("Username and password are required");
       return;
     }
 
     try {
       setIsSubmitting(true);
 
-      // Prepare payload according to API requirements
-      const loginPayload = {
-        username: username.trim(),
-        password: password,
-      };
+      // Use the login method from AuthContext
+      // This will handle API login, admin login, and Firebase fallback automatically
+      await login(username.trim(), password);
 
-      console.log("Sending login request:", { username: loginPayload.username });
-
-      const response = await fetch("https://vhdev.onrender.com/accounts/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(loginPayload),
-      });
-
-      // Handle different response scenarios
-      if (!response.ok) {
-        if (response.status === 502) {
-          throw new Error("Server is temporarily unavailable. Please try again later.");
-        }
-        
-        let errorData;
-        try {
-          errorData = await response.json();
-        } catch {
-          throw new Error(`Login failed (${response.status}). Please try again.`);
-        }
-
-        // Handle API error response
-        if (errorData.status === false) {
-          throw new Error(errorData.status_message || "Invalid credentials");
-        }
-        
-        throw new Error(errorData.message || errorData.status_message || "Login failed");
+      // Show appropriate success message based on login type
+      if (username === "admin" && password === "123") {
+        setSuccessMessage("Admin login successful! You have full access.");
+      } else {
+        // For API/Firebase users, the AuthContext will handle toast notifications
+        // but we can still show a message here for immediate feedback
+        setSuccessMessage("Login successful! Redirecting...");
       }
 
-      const data: LoginResponse = await response.json();
-      
-      // Check if the API returned success status
-      if (!data.status) {
-        throw new Error(data.status_message || "Login failed");
-      }
-
-      console.log("Login successful:", data);
-
-      // Store user data and tokens in localStorage
-      if (data.payload) {
-        const userData = {
-          id: data.payload.id,
-          username: data.payload.username,
-          firstName: data.payload.first_name,
-          lastName: data.payload.last_name,
-          email: data.payload.email,
-          mobile: data.payload.mobile,
-          userType: data.payload.user_type,
-          profileImg: data.payload.profile_img,
-          isAuthenticated: true,
-          loginTime: new Date().toISOString(),
-        };
-
-        localStorage.setItem("user", JSON.stringify(userData));
-        
-        // Store tokens if provided
-        if (data.payload.access_token) {
-          localStorage.setItem("accessToken", data.payload.access_token);
-        }
-        if (data.payload.refresh_token) {
-          localStorage.setItem("refreshToken", data.payload.refresh_token);
-        }
-      }
-
-      // Navigate to dashboard or intended page
-      const redirectTo = location.state?.from || "/dashboard";
-      navigate(redirectTo, { replace: true });
-
+      // Note: Navigation and role-specific toasts are handled by AuthContext
     } catch (error) {
       console.error("Login error:", error);
-      
+
+      // Extract error message
+      let errorMessage = "Login failed. Please check your credentials.";
+
       if (error instanceof Error) {
-        // Handle specific error messages
-        if (error.message.includes("Failed to fetch")) {
-          setError("Network error.");
-        } else if (error.message.includes("502")) {
-          setError("Server is temporarily unavailable due to CORS policy. Please try again later.");
-        } else {
-          setError(error.message);
-        }
-      } else {
-        setError("An unexpected error occurred. Please try again.");
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
       }
+
+      // Provide specific error messages for common scenarios
+      if (errorMessage.includes("Invalid email or password")) {
+        errorMessage = "Invalid username or password. Please try again.";
+      } else if (
+        errorMessage.includes("Network error") ||
+        errorMessage.includes("Failed to fetch")
+      ) {
+        errorMessage =
+          "Network error. Please check your internet connection and try again.";
+      } else if (
+        errorMessage.includes("too many requests") ||
+        errorMessage.includes("Too many")
+      ) {
+        errorMessage = "Too many failed attempts. Please try again later.";
+      }
+
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setError("");
+      setSuccessMessage("");
+      await loginWithGoogle();
+      // Success handling is done in AuthContext
+    } catch (error) {
+      console.error("Google login error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Google login failed. Please try again.";
+      setError(errorMessage);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      setError("");
+      setSuccessMessage("");
+      await loginWithFacebook();
+      // Success handling is done in AuthContext
+    } catch (error) {
+      console.error("Facebook login error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Facebook login failed. Please try again.";
+      setError(errorMessage);
     }
   };
 
@@ -192,12 +179,10 @@ const Login = () => {
     try {
       setIsResettingPassword(true);
       setError("");
-      
-      // You might need to implement password reset API call here
-      // For now, just showing a placeholder message
+
+      await resetPassword(username);
       setShowForgotPassword(false);
-      setSuccessMessage("If an account exists with that username, a password reset link has been sent!");
-      
+      setSuccessMessage("Password reset link sent to your email!");
     } catch (error) {
       console.error(error);
       setError(
@@ -208,9 +193,36 @@ const Login = () => {
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    setError(`${provider} login is not implemented yet. Please use username/password login.`);
-  };
+  // Show loading spinner while AuthContext is initializing
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex items-center justify-center gap-2">
+          <svg
+            className="animate-spin h-8 w-8 text-indigo-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <span className="text-gray-600">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen flex overflow-hidden">
@@ -229,6 +241,7 @@ const Login = () => {
         ))}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       </div>
+
       <motion.div
         className="relative z-10 flex items-center justify-center w-full"
         initial={{ opacity: 0 }}
@@ -250,6 +263,7 @@ const Login = () => {
                     onClick={() => {
                       setShowForgotPassword(false);
                       setError("");
+                      setSuccessMessage("");
                     }}
                     className="text-sm text-gray-500 hover:text-gray-700 flex items-center mb-6"
                   >
@@ -261,6 +275,12 @@ const Login = () => {
                   {error && (
                     <div className="bg-red-100 text-red-700 text-sm mb-4 p-3 rounded-md">
                       {error}
+                    </div>
+                  )}
+                  {successMessage && (
+                    <div className="bg-green-100 text-green-700 text-sm mb-4 p-3 rounded-md flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4" />
+                      {successMessage}
                     </div>
                   )}
                   <form onSubmit={handleResetPassword}>
@@ -337,18 +357,20 @@ const Login = () => {
                     </p>
                   </div>
 
-                  {/* Success Message */}
-                  {successMessage && (
-                    <div className="bg-green-100 text-green-700 text-sm mb-4 p-3 rounded-md flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4" />
-                      {successMessage}
-                    </div>
-                  )}
-
-                  {/* Error Message */}
                   {error && (
                     <div className="bg-red-100 text-red-700 text-sm mb-4 p-3 rounded-md">
                       {error}
+                    </div>
+                  )}
+
+                  {successMessage && (
+                    <div className="bg-green-100 text-green-700 text-sm mb-4 p-3 rounded-md flex items-center gap-2">
+                      {successMessage.includes("Admin") ? (
+                        <Shield className="h-4 w-4" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4" />
+                      )}
+                      {successMessage}
                     </div>
                   )}
 
@@ -368,7 +390,6 @@ const Login = () => {
                             required
                           />
                         </div>
-                        
                       </div>
 
                       <div className="space-y-2">
@@ -377,7 +398,11 @@ const Login = () => {
                           <button
                             type="button"
                             className="text-xs text-indigo-600 hover:text-indigo-800"
-                            onClick={() => setShowForgotPassword(true)}
+                            onClick={() => {
+                              setShowForgotPassword(true);
+                              setError("");
+                              setSuccessMessage("");
+                            }}
                           >
                             Forgot Password?
                           </button>
@@ -464,8 +489,9 @@ const Login = () => {
                       <Button
                         variant="outline"
                         className="w-full flex items-center gap-2"
-                        onClick={() => handleSocialLogin("Google")}
+                        onClick={handleGoogleLogin}
                         type="button"
+                        disabled={isSubmitting}
                       >
                         <GoogleIcon className="h-4 w-4" />
                         Google
@@ -473,8 +499,9 @@ const Login = () => {
                       <Button
                         variant="outline"
                         className="w-full flex items-center gap-2"
-                        onClick={() => handleSocialLogin("Facebook")}
+                        onClick={handleFacebookLogin}
                         type="button"
+                        disabled={isSubmitting}
                       >
                         <Facebook className="h-4 w-4 text-[#1877F2]" />
                         Facebook
