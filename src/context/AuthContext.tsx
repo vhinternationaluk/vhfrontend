@@ -876,6 +876,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isApiSession,
       });
 
+      // Call logout API if it's an API session
+      if (isApiSession || localStorage.getItem("isLoggedIn") === "true") {
+        const accessToken = localStorage.getItem("accessToken");
+
+        if (accessToken) {
+          console.log("Calling logout API...");
+          try {
+            const response = await fetch("/accounts/logout/", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+              },
+            });
+
+            if (response.ok) {
+              console.log("Logout API call successful");
+            } else {
+              console.warn(
+                "Logout API call failed:",
+                response.status,
+                response.statusText
+              );
+              // Continue with local logout even if API call fails
+            }
+          } catch (apiError) {
+            console.error("Error calling logout API:", apiError);
+            // Continue with local logout even if API call fails
+          }
+        }
+      }
+
       // Clear admin session
       if (
         isAdminSession ||

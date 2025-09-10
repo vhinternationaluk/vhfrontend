@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -13,7 +13,6 @@ import {
   ShoppingBag,
   Shield,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import Logo from "@/data/Assests/logo.png";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -30,17 +29,13 @@ import { motion, AnimatePresence } from "framer-motion";
 const Navbar = () => {
   const navigate = useNavigate();
   const { getItemCount } = useCart();
-  const { currentUser, logout, isAdmin, userRole } = useAuth();
+  const { currentUser, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Track scroll position to change navbar appearance
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 50);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -48,9 +43,9 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await logout();
-      // Navigation is handled in the AuthContext
+      // The logout function in AuthContext already handles navigation
     } catch (error) {
-      console.error("Failed to logout:", error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -76,30 +71,10 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            <Link
-              to="/"
-              className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200"
-            >
-              Home
-            </Link>
-            <Link
-              to="/shop"
-              className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200"
-            >
-              Shop
-            </Link>
-            <Link
-              to="/about"
-              className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200"
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200"
-            >
-              Contact
-            </Link>
+            <Link to="/" className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200">Home</Link>
+            <Link to="/shop" className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200">Shop</Link>
+            <Link to="/about" className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200">About</Link>
+            <Link to="/contact" className="text-sm lg:text-base font-medium hover:text-black/70 transition-colors duration-200">Contact</Link>
           </nav>
 
           {/* Right Side Icons */}
@@ -122,10 +97,7 @@ const Navbar = () => {
                     <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full"></span>
                   </motion.button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 p-2 bg-white/90 backdrop-blur-lg border border-gray-100 shadow-lg rounded-lg"
-                >
+                <DropdownMenuContent align="end" className="w-56 p-2 bg-white/90 backdrop-blur-lg border border-gray-100 shadow-lg rounded-lg">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-gray-900 truncate">
@@ -141,37 +113,22 @@ const Navbar = () => {
                       {currentUser.email}
                     </p>
                   </div>
-                  <DropdownMenuItem
-                    className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md mt-1"
-                    onClick={() => navigate("/profile")}
-                  >
+                  <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md mt-1" onClick={() => navigate("/profile")}>
                     <UserCircle className="h-4 w-4" />
                     <span>My Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
-                    onClick={() => navigate("/orders")}
-                  >
+                  <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md" onClick={() => navigate("/orders")}>
                     <Package className="h-4 w-4" />
                     <span>My Orders</span>
                   </DropdownMenuItem>
-                  
-                  {/* Show Manage Items only for Admin */}
                   {isAdmin && (
-                    <DropdownMenuItem
-                      className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md"
-                      onClick={() => navigate("/manage-items")}
-                    >
+                    <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer hover:bg-gray-50 transition-colors rounded-md" onClick={() => navigate("/manage-items")}>
                       <ShoppingBag className="h-4 w-4" />
                       <span>Manage Items</span>
                     </DropdownMenuItem>
                   )}
-                  
                   <DropdownMenuSeparator className="my-1 bg-gray-100" />
-                  <DropdownMenuItem
-                    className="flex items-center gap-2 py-2 text-red-500 cursor-pointer hover:bg-red-50 transition-colors rounded-md"
-                    onClick={handleLogout}
-                  >
+                  <DropdownMenuItem className="flex items-center gap-2 py-2 text-red-500 cursor-pointer hover:bg-red-50 transition-colors rounded-md" onClick={handleLogout}>
                     <LogOut className="h-4 w-4" />
                     <span>Logout</span>
                   </DropdownMenuItem>
@@ -198,11 +155,7 @@ const Navbar = () => {
             )}
 
             {/* Cart Icon */}
-            <Link
-              to="/cart"
-              className="p-2 rounded-full hover:bg-black/5 transition-colors relative"
-              aria-label="Cart"
-            >
+            <Link to="/cart" className="p-2 rounded-full hover:bg-black/5 transition-colors relative" aria-label="Cart">
               <ShoppingCart className="h-5 w-5" />
               {getItemCount() > 0 && (
                 <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-fade-in">
@@ -212,11 +165,7 @@ const Navbar = () => {
             </Link>
 
             {/* Mobile Menu Button */}
-            <button
-              className="p-2 rounded-full hover:bg-black/5 transition-colors md:hidden"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Menu"
-            >
+            <button className="p-2 rounded-full hover:bg-black/5 transition-colors md:hidden" onClick={() => setIsMobileMenuOpen(true)} aria-label="Menu">
               <Menu className="h-5 w-5" />
             </button>
           </div>
@@ -235,11 +184,7 @@ const Navbar = () => {
           >
             {/* Mobile Menu Header */}
             <div className="flex justify-between items-center p-4 border-b border-gray-100">
-              <Link
-                to="/"
-                className="flex items-center"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link to="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
                 <img
                   src={Logo}
                   alt="VH International"
@@ -259,86 +204,42 @@ const Navbar = () => {
 
             {/* Mobile Menu Content */}
             <nav className="flex flex-col p-6 space-y-6 overflow-y-auto">
-              <Link
-                to="/"
-                className="text-xl font-medium py-2 border-b border-gray-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                to="/shop"
-                className="text-xl font-medium py-2 border-b border-gray-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Shop
-              </Link>
-              <Link
-                to="/about"
-                className="text-xl font-medium py-2 border-b border-gray-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link
-                to="/contact"
-                className="text-xl font-medium py-2 border-b border-gray-100"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact
-              </Link>
+              <Link to="/" className="text-xl font-medium py-2 border-b border-gray-100" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+              <Link to="/shop" className="text-xl font-medium py-2 border-b border-gray-100" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
+              <Link to="/about" className="text-xl font-medium py-2 border-b border-gray-100" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+              <Link to="/contact" className="text-xl font-medium py-2 border-b border-gray-100" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
 
               {currentUser && (
                 <>
                   <div className="pt-4">
                     <div className="flex items-center gap-2 mb-4">
-                      <p className="text-sm text-gray-500 font-medium">
-                        Account
-                      </p>
+                      <p className="text-sm text-gray-500 font-medium">Account</p>
                       {isAdmin && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                          Admin
-                        </span>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Admin</span>
                       )}
                     </div>
-                    <Link
-                      to="/profile"
-                      className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <UserCircle className="h-5 w-5" />
-                      My Profile
+                    <Link to="/profile" className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
+                      onClick={() => setIsMobileMenuOpen(false)}>
+                      <UserCircle className="h-5 w-5" /> My Profile
                     </Link>
-                    <Link
-                      to="/orders"
-                      className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Package className="h-5 w-5" />
-                      My Orders
+                    <Link to="/orders" className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
+                      onClick={() => setIsMobileMenuOpen(false)}>
+                      <Package className="h-5 w-5" /> My Orders
                     </Link>
-                    
-                    {/* Show Manage Items only for Admin in mobile menu */}
                     {isAdmin && (
-                      <Link
-                        to="/manage-items"
-                        className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <ShoppingBag className="h-5 w-5" />
-                        Manage Items
+                      <Link to="/manage-items" className="text-lg font-medium py-2 border-b border-gray-100 flex items-center gap-2"
+                        onClick={() => setIsMobileMenuOpen(false)}>
+                        <ShoppingBag className="h-5 w-5" /> Manage Items
                       </Link>
                     )}
-                    
                     <button
                       className="text-lg font-medium text-red-500 text-left py-2 flex items-center gap-2"
-                      onClick={() => {
-                        handleLogout();
+                      onClick={async () => {
+                        await handleLogout();
                         setIsMobileMenuOpen(false);
                       }}
                     >
-                      <LogOut className="h-5 w-5" />
-                      Logout
+                      <LogOut className="h-5 w-5" /> Logout
                     </button>
                   </div>
                 </>
