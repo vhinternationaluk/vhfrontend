@@ -3,16 +3,77 @@ import Logo from "@/data/Assests/logo.png";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, RefreshCcw } from "lucide-react";
 import { CardDescription } from "@/components/ui/card";
+import { useProducts } from "@/hooks/use-products";
 
 const Index = () => {
-  // it is filtering outt the featured products formm the product list
-  const regularProducts = products.filter((p) => !p.featured);
+  const { products, loading, error } = useProducts();
 
-  // it is  Grouping  products by  their categoryy......
-  const categories = [...new Set(products.map((p) => p.category))];
+  // Get regular products (skip first 3 for featured section)
+  const regularProducts = products.slice(3);
+
+  // Get unique categories from products
+  const categories = [...new Set(products.map(p => p.product_category).filter(Boolean))];
+
+  // Get a representative product for each category
+  const getCategoryImage = (category: string) => {
+    const categoryProduct = products.find(p => p.product_category === category);
+    return categoryProduct?.img_url || "https://via.placeholder.com/400x300?text=Category";
+  };
+
+  const renderProductSection = () => {
+    if (loading && !products.length) {
+      return (
+        <div className="text-center py-16">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-700 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      );
+    }
+
+    if (error && !products.length) {
+      return (
+        <div className="text-center py-16">
+          <div className="bg-red-50 p-8 rounded-xl border border-red-200 inline-block">
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Refresh <RefreshCcw size={16} className="ml-2" />
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (regularProducts.length === 0 && !loading) {
+      return (
+        <div className="text-center py-16">
+          <p className="text-gray-600 mb-4">No products available at the moment.</p>
+          <p className="text-sm text-gray-500">Please check back later or contact us for more information.</p>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {loading && products.length > 0 && (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-700 mx-auto mb-2"></div>
+            <p className="text-gray-600 text-sm">Loading more products...</p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {regularProducts.map((product, index) => (
+            <ProductCard key={product.id} product={product} index={index} />
+          ))}
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#F9F7F5]">
@@ -22,35 +83,37 @@ const Index = () => {
       <HeroSection />
 
       {/* Category navigation */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <h2 className="text-3xl md:text-4xl font-medium mb-10">
-            Shop by room
-          </h2>
+      {categories.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <h2 className="text-3xl md:text-4xl font-medium mb-10">
+              Shop by category
+            </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categories.map((category, index) => (
-              <div
-                key={category}
-                className="relative rounded-lg overflow-hidden group h-40 md:h-48"
-                style={{ animationDelay: `${100 * index}ms` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 z-10"></div>
-                <img
-                  src={products.find((p) => p.category === category)?.image}
-                  alt={category}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                  <h3 className="text-white text-lg font-medium capitalize">
-                    {category}
-                  </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {categories.slice(0, 8).map((category, index) => (
+                <div
+                  key={category}
+                  className="relative rounded-lg overflow-hidden group h-40 md:h-48 animate-fade-in cursor-pointer"
+                  style={{ animationDelay: `${100 * index}ms` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 z-10"></div>
+                  <img
+                    src={getCategoryImage(category)}
+                    alt={category}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
+                    <h3 className="text-white text-lg font-medium capitalize">
+                      {category}
+                    </h3>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Product grid section */}
       <section className="py-20 bg-[#F9F7F5]">
@@ -58,7 +121,7 @@ const Index = () => {
           <div className="flex items-end justify-between mb-10">
             <div>
               <span className="inline-block px-3 py-1 text-xs font-medium tracking-wider bg-amber-50 text-amber-800 rounded-full mb-3">
-                New Arrivals
+                Our Products
               </span>
               <h2 className="text-3xl md:text-4xl font-medium">
                 Our Collection
@@ -72,11 +135,7 @@ const Index = () => {
             </a>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {regularProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))}
-          </div>
+          {renderProductSection()}
         </div>
       </section>
 
@@ -87,7 +146,7 @@ const Index = () => {
             Our Values
           </span>
           <h2 className="text-3xl md:text-4xl font-medium mb-10">
-            Why choose our furniture
+            Why choose our products
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
@@ -96,10 +155,10 @@ const Index = () => {
                 <span className="text-amber-700 font-medium text-xl">01</span>
               </div>
               <h3 className="font-medium text-xl mb-2">
-                Sustainable Materials
+                Premium Materials
               </h3>
               <p className="text-black/70">
-                Ethically sourced woods and fabrics that respect our planet's
+                High-quality brass and sustainable materials that respect our planet's
                 resources.
               </p>
             </div>
@@ -140,7 +199,7 @@ const Index = () => {
           </h2>
           <p className="text-white/70 max-w-xl mx-auto mb-8">
             Be the first to know about new collections, exclusive offers, and
-            interior design inspiration.
+            design inspiration.
           </p>
 
           <form className="max-w-md mx-auto flex">

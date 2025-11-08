@@ -99,14 +99,15 @@ const ADMIN_CREDENTIALS = {
   password: "AdminPass123!",
 };
 
-// Function to check if user is admin via API
+// Function to check if user is admin via API - FIXED VERSION
 const checkUserAdminStatus = async (accessToken: string): Promise<boolean> => {
   try {
     console.log("Checking admin status with API...");
     const response = await fetch("/accounts/user/is_admin", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        // Changed from Authorization to token header as requested
+        token: accessToken,
         "Content-Type": "application/json",
         Accept: "application/json",
       },
@@ -376,84 +377,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       console.log("Login attempt for:", email);
 
-      // Check for admin login first
-      if (
-        email === ADMIN_CREDENTIALS.email &&
-        password === ADMIN_CREDENTIALS.password
-      ) {
-        console.log("Admin login detected");
-
-        // Clear any existing sessions
-        if (auth.currentUser) {
-          await signOut(auth);
-        }
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("tokenExpiry");
-        localStorage.removeItem("loginTime");
-        localStorage.removeItem("username");
-        localStorage.removeItem("userRole");
-
-        // Create admin user object
-        const adminUser: UserWithRole = {
-          uid: "admin-uid",
-          email: "admin@VHINTERNATIONAL",
-          displayName: "Administrator",
-          emailVerified: true,
-          isAnonymous: false,
-          metadata: {
-            creationTime: new Date().toISOString(),
-            lastSignInTime: new Date().toISOString(),
-          },
-          providerData: [],
-          refreshToken: "admin-token",
-          tenantId: null,
-          phoneNumber: null,
-          photoURL: null,
-          providerId: "custom",
-          delete: async () => {
-            throw new Error("Delete operation not supported for admin users");
-          },
-          getIdToken: async () => "admin-token",
-          getIdTokenResult: async () => ({
-            token: "admin-token",
-            expirationTime: new Date(Date.now() + 3600000).toISOString(),
-            authTime: new Date().toISOString(),
-            issuedAtTime: new Date().toISOString(),
-            signInProvider: "custom",
-            signInSecondFactor: null,
-            claims: { role: "admin" },
-          }),
-          reload: async () => {
-            console.log("Reload called for admin user");
-          },
-          toJSON: () => ({}),
-          role: "admin",
-        };
-
-        // Set states
-        setCurrentUser(adminUser);
-        setUserRole("admin");
-        setIsAdminSession(true);
-        setIsApiSession(false);
-
-        // Persist admin session
-        localStorage.setItem("isAdminLoggedIn", "true");
-        localStorage.setItem("adminUser", JSON.stringify(adminUser));
-        localStorage.setItem("adminLoginTime", new Date().toISOString());
-
-        console.log("Admin session established successfully");
-
-        toast({
-          title: "Welcome Administrator",
-          description: "You have admin access to manage items.",
-        });
-        navigate("/");
-        return;
-      }
-
-      // Try API login for regular users
+      // First, always try API login (including for admin)
       console.log("Attempting API login...");
       try {
         const loginPayload = {
@@ -488,9 +412,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             const isAdminUser = await checkUserAdminStatus(
               data.payload.access_token
             );
-            const userRole: UserRole = isAdminUser ? "admin" : "user";
 
-            console.log("User admin status:", isAdminUser, "Role:", userRole);
+            // Also check if this is the hardcoded admin credentials
+            const isHardcodedAdmin =
+              email === ADMIN_CREDENTIALS.email &&
+              password === ADMIN_CREDENTIALS.password;
+
+            const userRole: UserRole =
+              isAdminUser || isHardcodedAdmin ? "admin" : "user";
+
+            console.log(
+              "User admin status:",
+              isAdminUser,
+              "Hardcoded admin:",
+              isHardcodedAdmin,
+              "Final role:",
+              userRole
+            );
 
             // Store API tokens and user info
             localStorage.setItem("accessToken", data.payload.access_token);
@@ -524,9 +462,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
             toast({
               title: "Login successful",
-              description: isAdminUser
-                ? "Welcome Administrator! You have admin access."
-                : "Welcome back!",
+              description:
+                userRole === "admin"
+                  ? "Welcome Administrator! You have admin access."
+                  : "Welcome back!",
             });
             navigate("/");
             return;
@@ -544,9 +483,90 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           );
         }
       } catch (apiError) {
-        console.log("API login failed, trying Firebase:", apiError);
+        console.log(
+          "API login failed, checking for fallback options:",
+          apiError
+        );
 
-        // If API login fails, try Firebase as fallback
+        // Fallback 1: Check for hardcoded admin credentials (local admin without API)
+        if (
+          email === ADMIN_CREDENTIALS.email &&
+          password === ADMIN_CREDENTIALS.password
+        ) {
+          console.log("Using fallback admin login (no API token)");
+
+          // Clear any existing sessions
+          if (auth.currentUser) {
+            await signOut(auth);
+          }
+          localStorage.removeItem("isLoggedIn");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("tokenExpiry");
+          localStorage.removeItem("loginTime");
+          localStorage.removeItem("username");
+          localStorage.removeItem("userRole");
+
+          // Create admin user object
+          const adminUser: UserWithRole = {
+            uid: "admin-uid",
+            email: "admin@VHINTERNATIONAL",
+            displayName: "Administrator",
+            emailVerified: true,
+            isAnonymous: false,
+            metadata: {
+              creationTime: new Date().toISOString(),
+              lastSignInTime: new Date().toISOString(),
+            },
+            providerData: [],
+            refreshToken: "admin-token",
+            tenantId: null,
+            phoneNumber: null,
+            photoURL: null,
+            providerId: "custom",
+            delete: async () => {
+              throw new Error("Delete operation not supported for admin users");
+            },
+            getIdToken: async () => "admin-token",
+            getIdTokenResult: async () => ({
+              token: "admin-token",
+              expirationTime: new Date(Date.now() + 3600000).toISOString(),
+              authTime: new Date().toISOString(),
+              issuedAtTime: new Date().toISOString(),
+              signInProvider: "custom",
+              signInSecondFactor: null,
+              claims: { role: "admin" },
+            }),
+            reload: async () => {
+              console.log("Reload called for admin user");
+            },
+            toJSON: () => ({}),
+            role: "admin",
+          };
+
+          // Set states
+          setCurrentUser(adminUser);
+          setUserRole("admin");
+          setIsAdminSession(true);
+          setIsApiSession(false);
+
+          // Persist admin session
+          localStorage.setItem("isAdminLoggedIn", "true");
+          localStorage.setItem("adminUser", JSON.stringify(adminUser));
+          localStorage.setItem("adminLoginTime", new Date().toISOString());
+
+          console.log("Fallback admin session established successfully");
+
+          toast({
+            title: "Welcome Administrator",
+            description:
+              "You have admin access to manage items. (Local session)",
+          });
+          navigate("/");
+          return;
+        }
+
+        // Fallback 2: Try Firebase as last resort
         console.log("Attempting Firebase login...");
         const userCredential = await signInWithEmailAndPassword(
           auth,
@@ -886,7 +906,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             const response = await fetch("/accounts/logout/", {
               method: "POST",
               headers: {
-                Authorization: `Bearer ${accessToken}`,
+                // Changed from Authorization to token header as requested
+                token: accessToken,
                 "Content-Type": "application/json",
                 Accept: "application/json",
               },

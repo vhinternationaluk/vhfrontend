@@ -1,5 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,9 +7,6 @@ import {
   Plus,
   Pencil,
   Trash2,
-  Upload,
-  X,
-  ShoppingBag,
   Loader2,
   Package,
   Users,
@@ -18,7 +14,6 @@ import {
   Tags,
   Search,
   Filter,
-  Eye,
   Check,
   Clock,
   TrendingUp,
@@ -26,7 +21,7 @@ import {
   Mail,
   Phone,
   MapPin,
-  CreditCard,
+  RefreshCw,
 } from "lucide-react";
 import {
   Sheet,
@@ -56,48 +51,44 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import ProductForm from "./ProductForm";
 import logo from "@/data/Assests/logo.png";
 
-// Mock data for demonstration
-const mockProducts = [
-  {
-    id: 1,
-    name: "Bras Lamp",
-    description: "High-quality brass lamp with copper finish",
-    price: 4999,
-    category: "Living Room",
-    image:
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5IZWFkcGhvbmVzPC90ZXh0Pjwvc3ZnPg==",
-    status: "active",
-    stock: 25,
-    sales: 145,
-  },
-  {
-    id: 2,
-    name: "Brass Coffee Mug",
-    description: "Premium ceramic coffee mug",
-    price: 299,
-    category: "home",
-    image:
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Db2ZmZWUgTXVnPC90ZXh0Pjwvc3ZnPg==",
-    status: "active",
-    stock: 50,
-    sales: 89,
-  },
-  {
-    id: 3,
-    name: " Brass Planter",
-    description: "Captivating planters for your indoor plants",
-    price: 2999,
-    category: "Decoration",
-    image:
-      "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5TaG9lczwvdGV4dD48L3N2Zz4=",
-    status: "inactive",
-    stock: 0,
-    sales: 67,
-  },
-];
+// API Product interface matching the API response
+interface ApiProduct {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  quantity: number;
+  img_url: string | null;
+  discount: number;
+  is_active: boolean;
+  created_by: string;
+  created_on: string;
+  modified_by: string;
+  modified_on: string;
+  no_of_purchase: number;
+  product_category: string | null;
+}
 
+// Local Product interface (transformed from API)
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image: string;
+  status: "active" | "inactive";
+  stock: number;
+  sales: number;
+  discount: number;
+}
+
+// Mock data for categories (keeping as static for now)
 const mockCategories = [
   {
     id: 1,
@@ -133,6 +124,7 @@ const mockCategories = [
   },
 ];
 
+// Mock data for orders (keeping as static for now)
 const mockOrders = [
   {
     id: "ORD001",
@@ -175,6 +167,7 @@ const mockOrders = [
   },
 ];
 
+// Mock data for users (keeping as static for now)
 const mockUsers = [
   {
     id: 1,
@@ -214,33 +207,19 @@ const mockUsers = [
   },
 ];
 
-// Utility functions
-const fileToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-};
-
-const validateImageFile = (file) => {
-  const maxSize = 5 * 1024 * 1024; // 5MB
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-
-  if (!allowedTypes.includes(file.type)) {
-    return {
-      valid: false,
-      message: "Please select a valid image file (JPEG, PNG, WebP, or GIF)",
-    };
-  }
-
-  if (file.size > maxSize) {
-    return { valid: false, message: "Image size should be less than 5MB" };
-  }
-
-  return { valid: true };
-};
+// Transform API product to local product format
+const transformApiProduct = (apiProduct: ApiProduct): Product => ({
+  id: apiProduct.id,
+  name: apiProduct.name,
+  description: apiProduct.description,
+  price: apiProduct.cost,
+  category: apiProduct.product_category || "Uncategorized",
+  image: apiProduct.img_url || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=",
+  status: apiProduct.is_active ? "active" : "inactive",
+  stock: apiProduct.quantity,
+  sales: apiProduct.no_of_purchase,
+  discount: apiProduct.discount,
+});
 
 // Status badge component
 const StatusBadge = ({ status, type = "default" }) => {
@@ -265,197 +244,11 @@ const StatusBadge = ({ status, type = "default" }) => {
   return <Badge className={`${getStatusColor()} border-0`}>{status}</Badge>;
 };
 
-// Product Form Component
-const ProductFormFields = ({
-  formData,
-  setFormData,
-  imagePreview,
-  setImagePreview,
-  imageFile,
-  setImageFile,
-  editingItem,
-  categories,
-}) => {
-  const handleInputChange = useCallback(
-    (e) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    },
-    [setFormData]
-  );
-
-  const handleImageChange = useCallback(
-    async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const validation = validateImageFile(file);
-      if (!validation.valid) {
-        alert(validation.message);
-        return;
-      }
-
-      setImageFile(file);
-      try {
-        const base64 = await fileToBase64(file);
-        setImagePreview(base64);
-        setFormData((prev) => ({ ...prev, image: base64 }));
-      } catch (error) {
-        console.error("Error converting image:", error);
-        alert("Failed to process image");
-      }
-    },
-    [setFormData, setImagePreview, setImageFile]
-  );
-
-  const removeImage = useCallback(() => {
-    setImagePreview("");
-    setFormData((prev) => ({ ...prev, image: "" }));
-    setImageFile(null);
-  }, [setFormData, setImagePreview, setImageFile]);
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="product-name">Product Name *</Label>
-        <Input
-          id="product-name"
-          name="name"
-          value={formData.name}
-          onChange={handleInputChange}
-          placeholder="Product name"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="product-description">Description</Label>
-        <Textarea
-          id="product-description"
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="Product description"
-          rows={3}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="product-price">Price (₹) *</Label>
-          <Input
-            id="product-price"
-            name="price"
-            type="number"
-            value={formData.price}
-            onChange={handleInputChange}
-            placeholder="0.00"
-            min="0"
-            step="0.01"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="product-stock">Stock Quantity *</Label>
-          <Input
-            id="product-stock"
-            name="stock"
-            type="number"
-            value={formData.stock}
-            onChange={handleInputChange}
-            placeholder="0"
-            min="0"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="product-category">Category *</Label>
-        <Select
-          value={formData.category}
-          onValueChange={(value) =>
-            setFormData((prev) => ({ ...prev, category: value }))
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category.slug} value={category.slug}>
-                {category.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="product-status">Status *</Label>
-        <Select
-          value={formData.status}
-          onValueChange={(value) =>
-            setFormData((prev) => ({ ...prev, status: value }))
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="product-image">
-          Product Image {!editingItem && "*"}
-        </Label>
-        <div className="flex items-center gap-4">
-          <label
-            htmlFor="product-image-upload"
-            className="flex items-center justify-center w-full h-12 px-4 border border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-400 transition-colors"
-          >
-            <Upload size={18} className="mr-2" />
-            <span>{imageFile ? imageFile.name : "Upload image"}</span>
-            <input
-              id="product-image-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-          </label>
-          {imagePreview && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={removeImage}
-            >
-              <X size={18} />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {imagePreview && (
-        <div className="mt-4 border rounded-md overflow-hidden w-full max-w-xs">
-          <img
-            src={imagePreview}
-            alt="Preview"
-            className="w-full h-auto object-cover"
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
 // Main Admin Dashboard Component
 const AdminDashboard = () => {
+  const { currentUser } = useAuth();
+  const { toast } = useToast();
+
   // State management
   const [activeTab, setActiveTab] = useState("products");
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -463,135 +256,131 @@ const AdminDashboard = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  
+  // Loading states
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState(null);
 
   // Form data states
-  const [productFormData, setProductFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    image: "",
-    status: "active",
-    stock: "",
-  });
   const [categoryFormData, setCategoryFormData] = useState({
     name: "",
     slug: "",
     description: "",
     status: "active",
   });
-  const [imagePreview, setImagePreview] = useState("");
-  const [imageFile, setImageFile] = useState(null);
 
-  // Mock data states (in real app, these would come from context/API)
-  const [products, setProducts] = useState(mockProducts);
+  // Data states - products now dynamic, others remain static
+  const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState(mockCategories);
   const [orders, setOrders] = useState(mockOrders);
   const [users, setUsers] = useState(mockUsers);
 
+  // Get bearer token from auth context
+  const getBearerToken = useCallback(() => {
+    // Try to get token from localStorage first (API session)
+    const apiToken = localStorage.getItem("accessToken");
+    if (apiToken) {
+      return apiToken;
+    }
+
+    // If currentUser exists and has getIdToken method
+    if (currentUser && typeof currentUser.getIdToken === 'function') {
+      // For Firebase users, we would need to call getIdToken()
+      // But since we're primarily using API tokens, we'll focus on that
+      return null;
+    }
+
+    return null;
+  }, [currentUser]);
+
+  // Fetch products from API
+  const fetchProducts = useCallback(async () => {
+    setProductsLoading(true);
+    setProductsError(null);
+
+    try {
+      const token = getBearerToken();
+      
+      if (!token) {
+        throw new Error("No authentication token available");
+      }
+
+      console.log("Fetching products with token...");
+      
+      const response = await fetch("/products/list/", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Authentication failed. Please login again.");
+        } else if (response.status === 403) {
+          throw new Error("You don't have permission to access this resource.");
+        } else {
+          throw new Error(`Failed to fetch products: ${response.status} ${response.statusText}`);
+        }
+      }
+
+      const apiProducts: ApiProduct[] = await response.json();
+      console.log("Fetched products:", apiProducts);
+
+      // Transform API products to local format
+      const transformedProducts = apiProducts.map(transformApiProduct);
+      setProducts(transformedProducts);
+
+      toast({
+        title: "Products loaded",
+        description: `Successfully loaded ${transformedProducts.length} products.`,
+      });
+
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setProductsError(error.message);
+      
+      toast({
+        title: "Failed to load products",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProductsLoading(false);
+    }
+  }, [getBearerToken, toast]);
+
+  // Load products on component mount
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
   // Form reset function
   const resetForm = useCallback(() => {
-    setProductFormData({
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      image: "",
-      status: "active",
-      stock: "",
-    });
     setCategoryFormData({
       name: "",
       slug: "",
       description: "",
       status: "active",
     });
-    setImagePreview("");
-    setImageFile(null);
     setEditingItem(null);
   }, []);
 
-  // Product management functions
-  const openAddProductSheet = useCallback(() => {
-    resetForm();
-    setIsSheetOpen(true);
-  }, [resetForm]);
-
-  const openEditProductSheet = useCallback((product) => {
-    setEditingItem(product);
-    setProductFormData({
-      name: product.name,
-      description: product.description,
-      price: product.price.toString(),
-      category: product.category,
-      image: product.image,
-      status: product.status,
-      stock: product.stock.toString(),
-    });
-    setImagePreview(product.image);
-    setIsSheetOpen(true);
+  // Product management functions for ProductForm component
+  const handleProductAdd = useCallback((newProduct) => {
+    setProducts((prev) => [...prev, newProduct]);
   }, []);
 
-  const handleProductSubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
-      if (
-        !productFormData.name ||
-        !productFormData.price ||
-        !productFormData.category ||
-        (!productFormData.image && !editingItem)
-      ) {
-        alert("Please fill in all required fields");
-        return;
-      }
+  const handleProductUpdate = useCallback((productId, updatedProduct) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === productId ? { ...p, ...updatedProduct } : p))
+    );
+  }, []);
 
-      setIsProcessing(true);
-      try {
-        const productData = {
-          name: productFormData.name,
-          description: productFormData.description,
-          price: parseFloat(productFormData.price),
-          category: productFormData.category,
-          status: productFormData.status,
-          stock: parseInt(productFormData.stock),
-          sales: editingItem?.sales || 0,
-          ...(productFormData.image && { image: productFormData.image }),
-        };
-
-        if (editingItem) {
-          setProducts((prev) =>
-            prev.map((p) =>
-              p.id === editingItem.id ? { ...p, ...productData } : p
-            )
-          );
-        } else {
-          const newProduct = {
-            ...productData,
-            id: Date.now(),
-            image: productFormData.image,
-          };
-          setProducts((prev) => [...prev, newProduct]);
-        }
-
-        setIsSheetOpen(false);
-        resetForm();
-      } catch (error) {
-        console.error("Error saving product:", error);
-        alert(`Failed to ${editingItem ? "update" : "add"} product`);
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    [productFormData, editingItem, resetForm]
-  );
-
-  const handleDeleteProduct = useCallback(async (id) => {
-    try {
-      setProducts((prev) => prev.filter((p) => p.id !== id));
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("Failed to delete product");
-    }
+  const handleProductDelete = useCallback((productId) => {
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
   }, []);
 
   // Category management functions
@@ -663,18 +452,12 @@ const AdminDashboard = () => {
     setUsers((prev) => prev.filter((user) => user.id !== userId));
   }, []);
 
-  // Filtered data based on search and filters
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesSearch =
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesFilter =
-        filterStatus === "all" || product.status === filterStatus;
-      return matchesSearch && matchesFilter;
-    });
-  }, [products, searchTerm, filterStatus]);
+  // Refresh products function
+  const handleRefreshProducts = useCallback(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
+  // Filtered data based on search and filters
   const filteredCategories = useMemo(() => {
     return categories.filter((category) => {
       const matchesSearch = category.name
@@ -832,218 +615,109 @@ const AdminDashboard = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Search and Filter Bar */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex gap-4 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-                <Input
-                  placeholder={`Search ${activeTab}...`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[180px]">
-                  <Filter size={16} className="mr-2" />
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  {activeTab === "orders" && (
-                    <>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="shipped">Shipped</SelectItem>
-                      <SelectItem value="delivered">Delivered</SelectItem>
-                    </>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-            {(activeTab === "products" || activeTab === "categories") && (
-              <Button
-                onClick={
-                  activeTab === "products"
-                    ? openAddProductSheet
-                    : () => {
-                        resetForm();
-                        setIsSheetOpen(true);
-                      }
-                }
-              >
-                <Plus size={16} className="mr-2" />
-                Add {activeTab === "products" ? "Product" : "Category"}
-              </Button>
-            )}
-          </div>
-
-          {/* Products Tab */}
-          <TabsContent value="products" className="space-y-6">
-            <Card>
-              <CardContent className="p-0">
-                {filteredProducts.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full table-auto">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                            Image
-                          </th>
-                          <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                            Name
-                          </th>
-                          <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                            Category
-                          </th>
-                          <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                            Price
-                          </th>
-                          <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                            Stock
-                          </th>
-                          <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                            Sales
-                          </th>
-                          <th className="px-6 py-4 text-left text-sm font-medium text-gray-500">
-                            Status
-                          </th>
-                          <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {filteredProducts.map((product) => (
-                          <tr key={product.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="w-16 h-16 rounded-md overflow-hidden">
-                                <img
-                                  src={product.image}
-                                  alt={product.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
-                                {product.name}
-                              </div>
-                              <div className="text-xs text-gray-500 truncate max-w-[200px]">
-                                {product.description}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="text-xs bg-amber-50 text-amber-800 px-2 py-1 rounded-full capitalize">
-                                {product.category}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium">
-                                ₹{product.price.toLocaleString()}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div
-                                className={`text-sm font-medium ${
-                                  product.stock === 0
-                                    ? "text-red-600"
-                                    : product.stock < 10
-                                    ? "text-yellow-600"
-                                    : "text-green-600"
-                                }`}
-                              >
-                                {product.stock}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium">
-                                {product.sales}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <StatusBadge status={product.status} />
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                              <div className="flex items-center justify-end space-x-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-gray-500 hover:text-black"
-                                  onClick={() => openEditProductSheet(product)}
-                                >
-                                  <Pencil size={16} />
-                                </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="text-gray-500 hover:text-red-500"
-                                    >
-                                      <Trash2 size={16} />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>
-                                        Delete Product
-                                      </AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete "
-                                        {product.name}"? This action cannot be
-                                        undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>
-                                        Cancel
-                                      </AlertDialogCancel>
-                                      <AlertDialogAction
-                                        className="bg-red-500 text-white hover:bg-red-600"
-                                        onClick={() =>
-                                          handleDeleteProduct(product.id)
-                                        }
-                                      >
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="p-12 flex flex-col items-center justify-center">
-                    <div className="bg-gray-100 p-4 rounded-full mb-4">
-                      <Package className="w-8 h-8 text-gray-400" />
-                    </div>
-                    <p className="text-lg font-medium mb-2">
-                      No products found
-                    </p>
-                    <p className="text-gray-600 mb-6 text-center max-w-md">
-                      {searchTerm || filterStatus !== "all"
-                        ? "No products match your search criteria. Try adjusting your filters."
-                        : "You haven't added any products yet. Click the 'Add Product' button to get started."}
-                    </p>
-                    {!searchTerm && filterStatus === "all" && (
-                      <Button onClick={openAddProductSheet}>
-                        Add Your First Product
-                      </Button>
+          {/* Search and Filter Bar (only for categories, orders, users) */}
+          {activeTab !== "products" && (
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="flex gap-4 flex-1">
+                <div className="relative flex-1 max-w-md">
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
+                  <Input
+                    placeholder={`Search ${activeTab}...`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="w-[180px]">
+                    <Filter size={16} className="mr-2" />
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    {activeTab === "orders" && (
+                      <>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="shipped">Shipped</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                      </>
                     )}
+                  </SelectContent>
+                </Select>
+              </div>
+              {activeTab === "categories" && (
+                <Button
+                  onClick={() => {
+                    resetForm();
+                    setIsSheetOpen(true);
+                  }}
+                >
+                  <Plus size={16} className="mr-2" />
+                  Add Category
+                </Button>
+              )}
+            </div>
+          )}
+
+          {/* Products Tab - Updated with API integration and refresh button */}
+          <TabsContent value="products" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg font-semibold">Products Management</h2>
+              <Button
+                onClick={handleRefreshProducts}
+                disabled={productsLoading}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <RefreshCw size={16} className={productsLoading ? "animate-spin" : ""} />
+                Refresh
+              </Button>
+            </div>
+            
+            {productsError && (
+              <Card className="border-red-200 bg-red-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-red-800">
+                    <div className="text-sm">
+                      <strong>Error loading products:</strong> {productsError}
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={handleRefreshProducts}
+                      className="ml-auto"
+                    >
+                      Retry
+                    </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
+
+            {productsLoading ? (
+              <Card>
+                <CardContent className="p-12 flex flex-col items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-gray-400 mb-4" />
+                  <p className="text-lg font-medium mb-2">Loading products...</p>
+                  <p className="text-gray-600">Please wait while we fetch your products.</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <ProductForm
+                products={products}
+                categories={categories}
+                onProductAdd={handleProductAdd}
+                onProductUpdate={handleProductUpdate}
+                onProductDelete={handleProductDelete}
+                refreshProducts={handleRefreshProducts}
+                isLoading={productsLoading}
+              />
+            )}
           </TabsContent>
 
           {/* Categories Tab */}
@@ -1502,119 +1176,91 @@ const AdminDashboard = () => {
         </Tabs>
       </div>
 
-      {/* Product/Category Form Sheet */}
+      {/* Category Form Sheet */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent className="sm:max-w-[540px] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>
-              {activeTab === "products"
-                ? editingItem
-                  ? "Edit Product"
-                  : "Add New Product"
-                : editingItem
-                ? "Edit Category"
-                : "Add New Category"}
+              {editingItem ? "Edit Category" : "Add New Category"}
             </SheetTitle>
           </SheetHeader>
 
-          <form
-            onSubmit={
-              activeTab === "products"
-                ? handleProductSubmit
-                : handleCategorySubmit
-            }
-            className="mt-6"
-          >
+          <form onSubmit={handleCategorySubmit} className="mt-6">
             <div className="space-y-6">
-              {activeTab === "products" ? (
-                <ProductFormFields
-                  formData={productFormData}
-                  setFormData={setProductFormData}
-                  imagePreview={imagePreview}
-                  setImagePreview={setImagePreview}
-                  imageFile={imageFile}
-                  setImageFile={setImageFile}
-                  editingItem={editingItem}
-                  categories={categories}
-                />
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="category-name">Category Name *</Label>
-                    <Input
-                      id="category-name"
-                      name="name"
-                      value={categoryFormData.name}
-                      onChange={(e) =>
-                        setCategoryFormData((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                          slug: e.target.value
-                            .toLowerCase()
-                            .replace(/\s+/g, "-"),
-                        }))
-                      }
-                      placeholder="Category name"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category-slug">Slug *</Label>
-                    <Input
-                      id="category-slug"
-                      name="slug"
-                      value={categoryFormData.slug}
-                      onChange={(e) =>
-                        setCategoryFormData((prev) => ({
-                          ...prev,
-                          slug: e.target.value,
-                        }))
-                      }
-                      placeholder="category-slug"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category-description">Description</Label>
-                    <Textarea
-                      id="category-description"
-                      name="description"
-                      value={categoryFormData.description}
-                      onChange={(e) =>
-                        setCategoryFormData((prev) => ({
-                          ...prev,
-                          description: e.target.value,
-                        }))
-                      }
-                      placeholder="Category description"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category-status">Status *</Label>
-                    <Select
-                      value={categoryFormData.status}
-                      onValueChange={(value) =>
-                        setCategoryFormData((prev) => ({
-                          ...prev,
-                          status: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="category-name">Category Name *</Label>
+                  <Input
+                    id="category-name"
+                    name="name"
+                    value={categoryFormData.name}
+                    onChange={(e) =>
+                      setCategoryFormData((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                        slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
+                      }))
+                    }
+                    placeholder="Category name"
+                    required
+                  />
                 </div>
-              )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="category-slug">Slug *</Label>
+                  <Input
+                    id="category-slug"
+                    name="slug"
+                    value={categoryFormData.slug}
+                    onChange={(e) =>
+                      setCategoryFormData((prev) => ({
+                        ...prev,
+                        slug: e.target.value,
+                      }))
+                    }
+                    placeholder="category-slug"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category-description">Description</Label>
+                  <Textarea
+                    id="category-description"
+                    name="description"
+                    value={categoryFormData.description}
+                    onChange={(e) =>
+                      setCategoryFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder="Category description"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category-status">Status *</Label>
+                  <Select
+                    value={categoryFormData.status}
+                    onValueChange={(value) =>
+                      setCategoryFormData((prev) => ({
+                        ...prev,
+                        status: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
 
             <SheetFooter className="mt-8 pt-4 border-t">
@@ -1633,11 +1279,7 @@ const AdminDashboard = () => {
                 {isProcessing && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {editingItem
-                  ? `Update ${
-                      activeTab === "products" ? "Product" : "Category"
-                    }`
-                  : `Add ${activeTab === "products" ? "Product" : "Category"}`}
+                {editingItem ? "Update Category" : "Add Category"}
               </Button>
             </SheetFooter>
           </form>
